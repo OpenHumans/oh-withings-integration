@@ -8,6 +8,14 @@ name = "pypi"
 [packages]
 
 django = "*"
+whitenoise = "*"
+dj-database-url = "*"
+gunicorn = "*"
+celery = "*"
+arrow = "*"
+requests = "*"
+amqp = "*"
+"psycopg2" = "*"
 
 
 [dev-packages]
