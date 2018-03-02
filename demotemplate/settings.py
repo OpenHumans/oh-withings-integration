@@ -25,10 +25,7 @@ DEBUG = False if os.getenv('DEBUG', '').lower() == 'false' else True
 
 REMOTE = True if os.getenv('REMOTE', '').lower() == 'true' else False
 
-if REMOTE:
-    ALLOWED_HOSTS = ['*']
-else:
-    ALLOWED_HOSTS - []
+ALLOWED_HOSTS = ['*']
 
 APP_BASE_URL = os.getenv('APP_BASE_URL')
 
