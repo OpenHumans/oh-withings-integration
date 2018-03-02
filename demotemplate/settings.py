@@ -74,7 +74,13 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'oh_project_template.urls'
+MIDDLEWARE_CLASSES = (
+    # Simplified static file serving.
+    # https://warehouse.python.org/project/whitenoise/
+    'whitenoise.middleware.WhiteNoiseMiddleware'
+)
+
+ROOT_URLCONF = 'demotemplate.urls'
 
 TEMPLATES = [
     {
