@@ -27,7 +27,25 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False if os.getenv('DEBUG', '').lower() == 'false' else True
 
-ALLOWED_HOSTS = []
+REMOTE = True if os.getenv('REMOTE', '').lower() == 'true' else False
+
+if REMOTE:
+    ALLOWED_HOSTS = ['*']
+else:
+    ALLOWED_HOSTS - []
+
+APP_BASE_URL = os.getenv('APP_BASE_URL')
+
+# Open Humans configuration
+OH_CLIENT_ID = os.getenv('OH_CLIENT_ID')
+OH_CLIENT_SECRET = os.getenv('OH_CLIENT_SECRET')
+OH_ACTIVITY_PAGE = os.getenv('OH_ACTIVITY_PAGE')
+OH_BASE_URL = 'https://www.openhumans.org'
+
+OH_API_BASE = 'https://www.openhumans.org/api/direct-sharing'
+OH_DELETE_FILES = OH_API_BASE + '/project/files/delete/'
+OH_DIRECT_UPLOAD = OH_API_BASE + '/project/files/upload/direct/'
+OH_DIRECT_UPLOAD_COMPLETE = OH_API_BASE + '/project/files/upload/complete/'
 
 
 # Application definition
