@@ -37,6 +37,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'datadownloader.apps.Datadownloader.Config'
+    'datauploader.apps.Datauploader.Config'
+    'open_humans.apps.Open_humans.Config'
+    'main.apps.Main.Config'
 ]
 
 MIDDLEWARE = [
