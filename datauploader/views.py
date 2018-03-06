@@ -13,7 +13,7 @@ import requests
 from celery import shared_task
 from django.utils import lorem_ipsum
 from django.conf import settings
-from .models import OpenHumansMember
+from open_humans.models import OpenHumansMember
 
 
 @shared_task
