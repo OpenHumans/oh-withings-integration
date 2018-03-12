@@ -12,7 +12,7 @@ OH_DELETE_FILES = OH_API_BASE + '/project/files/delete/'
 OH_DIRECT_UPLOAD = OH_API_BASE + '/project/files/upload/direct/'
 OH_DIRECT_UPLOAD_COMPLETE = OH_API_BASE + '/project/files/upload/complete/'
 
-OPPENHUMANS_APP_BASE_URL = settings.OPENHUMANS_APP_BASE_URL
+OPENHUMANS_APP_BASE_URL = settings.OPENHUMANS_APP_BASE_URL
 
 
 def make_unique_username(base):
