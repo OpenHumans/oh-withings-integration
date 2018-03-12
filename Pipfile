@@ -7,15 +7,15 @@ name = "pypi"
 
 [packages]
 
-django = "*"
-whitenoise = "*"
-dj-database-url = "*"
-gunicorn = "*"
-celery = "*"
-arrow = "*"
-requests = "*"
 amqp = "*"
+arrow = "*"
+celery = "*"
+dj-database-url = "*"
+django = "*"
+gunicorn = "*"
 "psycopg2" = "*"
+requests = "*"
+whitenoise = "*"
 
 
 [dev-packages]
