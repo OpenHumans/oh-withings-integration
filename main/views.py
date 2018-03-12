@@ -18,10 +18,16 @@ def index(request):
     context = {'client_id': settings.OH_CLIENT_ID,
                'oh_proj_page': settings.OH_ACTIVITY_PAGE}
 
-    return render(request, 'datauploader/index.html', context=context)
+    return render(request, 'main/index.html', context=context)
 
 
-def complete(request):
+def complete_nokiahealth(request):
+    logger.debug("Received user returning from Nokia Health")
+
+    return render(request, 'main/complete_nokiahealth.html')
+
+
+def complete_oh(request):
     """
     Receive user from Open Humans. Store data, start upload.
     """
@@ -42,7 +48,7 @@ def complete(request):
         xfer_to_open_humans.delay(oh_id=oh_member.oh_id)
         context = {'oh_id': oh_member.oh_id,
                    'oh_proj_page': settings.OH_ACTIVITY_PAGE}
-        return render(request, 'datauploader/complete.html',
+        return render(request, 'main/complete_oh.html',
                       context=context)
 
     logger.debug('Invalid code exchange. User returned to starting page.')
