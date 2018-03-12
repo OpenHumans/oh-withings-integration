@@ -4,7 +4,7 @@ import requests
 from django.contrib.auth import login
 from django.shortcuts import render, redirect
 from django.conf import settings
-from datauploader.views import xfer_to_open_humans
+from datauploader.tasks import xfer_to_open_humans
 from open_humans.models import OpenHumansMember
 
 # Set up logging.
