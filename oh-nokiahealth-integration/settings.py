@@ -42,6 +42,9 @@ OPENHUMANS_CLIENT_SECRET = os.getenv('OH_CLIENT_SECRET')
 OH_ACTIVITY_PAGE = os.getenv('OH_ACTIVITY_PAGE')
 OPENHUMANS_OH_BASE_URL = 'https://www.openhumans.org'
 
+OH_API_BASE = OPENHUMANS_OH_BASE_URL + '/api/direct-sharing'
+OH_DIRECT_UPLOAD_COMPLETE = OH_API_BASE + '/project/files/upload/complete_oh/'
+
 # Application definition
 
 INSTALLED_APPS = [
