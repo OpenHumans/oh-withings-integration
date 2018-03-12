@@ -15,7 +15,7 @@ def index(request):
     """
     Starting page for app.
     """
-    context = {'client_id': settings.OH_CLIENT_ID,
+    context = {'client_id': settings.OPENHUMANS_CLIENT_ID,
                'oh_proj_page': settings.OH_ACTIVITY_PAGE}
 
     return render(request, 'main/index.html', context=context)
@@ -60,18 +60,20 @@ def oh_code_to_member(code):
     Exchange code for token, use this to create and return OpenHumansMember.
     If a matching OpenHumansMember exists, update and return it.
     """
-    if settings.OH_CLIENT_SECRET and settings.OH_CLIENT_ID and code:
+    if settings.OPENHUMANS_CLIENT_SECRET and \
+       settings.OPENHUMANS_CLIENT_ID and code:
         data = {
             'grant_type': 'authorization_code',
-            'redirect_uri': '{}/complete'.format(settings.APP_BASE_URL),
+            'redirect_uri':
+            '{}/complete'.format(settings.OPENHUMANS_APP_BASE_URL),
             'code': code,
         }
         req = requests.post(
-            '{}/oauth2/token/'.format(settings.OH_BASE_URL),
+            '{}/oauth2/token/'.format(settings.OPENHUMANS_OH_BASE_URL),
             data=data,
             auth=requests.auth.HTTPBasicAuth(
-                settings.OH_CLIENT_ID,
-                settings.OH_CLIENT_SECRET
+                settings.OPENHUMANS_CLIENT_ID,
+                settings.OPENHUMANS_CLIENT_SECRET
             )
         )
         data = req.json()
@@ -112,7 +114,7 @@ def oh_get_member_data(token):
     """
     req = requests.get(
         '{}/api/direct-sharing/project/exchange-member/'
-        .format(settings.OH_BASE_URL),
+        .format(settings.OPENHUMANS_OH_BASE_URL),
         params={'access_token': token}
         )
     if req.status_code == 200:
