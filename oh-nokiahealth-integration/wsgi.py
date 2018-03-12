@@ -1,5 +1,5 @@
 """
-WSGI config for demotemplate project.
+WSGI config for oh-nokiahealth-integration project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,7 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "demotemplate.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE",
+                      "oh-nokiahealth-integration.settings")
 
 application = get_wsgi_application()
