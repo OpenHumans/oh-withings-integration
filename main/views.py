@@ -1,5 +1,6 @@
 import logging
 import requests
+import secrets
 
 from django.contrib.auth import login
 from django.shortcuts import render, redirect
@@ -57,14 +58,18 @@ def complete(request):
         login(request, user,
               backend='django.contrib.auth.backends.ModelBackend')
 
+        nokia_oauth_timestamp = int(time.time())
+        nokia_oauth_nonce = create_nokia_nonce()
+        nokia_oauth_signature = create_nokia_oauth_signature()
+
         # Render `complete.html`.
         context = {'oh_id': oh_member.oh_id,
                    'oh_proj_page': settings.OH_ACTIVITY_PAGE,
                    'nokia_consumer_key': settings.NOKIA_CONSUMER_KEY,
                    'nokia_callback_url': settings.NOKIA_CALLBACK_URL,
-                   'nokia_oauth_nonce': settings.NOKIA_OAUTH_NONCE,
-                   'nokia_oauth_signature': settings.NOKIA_OAUTH_SIGNATURE,
-                   'nokia_oauth_timestamp': settings.NOKIA_OAUTH_TIMESTAMP
+                   'nokia_oauth_nonce': nokia_oauth_nonce,
+                   'nokia_oauth_signature': nokia_oauth_signature,
+                   'nokia_oauth_timestamp': nokia_oauth_timestamp
                    }
         return render(request, 'main/complete.html',
                       context=context)
@@ -139,6 +144,11 @@ def oh_get_member_data(token):
         return req.json()
     raise Exception('Status code {}'.format(req.status_code))
     return None
+
+
+def create_nokia_nonce(length=8):
+    secrets.token_hex(length)
+
 
 def nokia_get_access_token(key, secret):
     """

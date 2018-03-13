@@ -58,8 +58,6 @@ if REMOTE is False:
 else:
     NOKIA_CALLBACK_URL = 'oh-nokiahealth.herokuapp.com%2Fcomplete_nokia'
 
-NOKIA_OAUTH_TIMESTAMP = int(time.time())
-
 # Application definition
 
 INSTALLED_APPS = [
