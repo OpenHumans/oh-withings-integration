@@ -22,14 +22,20 @@ def index(request):
 
 
 def complete_nokia(request):
+    """
+    Receive user data from Nokia Health, store it, and start upload.
+    """
     logger.debug("Received user returning from Nokia Health")
+
+    # Initiate a data transfer task, then render `complete.html`.
+    xfer_to_open_humans.delay(oh_id=oh_member.oh_id)
 
     return render(request, 'main/complete_nokia.html')
 
 
 def complete(request):
     """
-    Receive user from Open Humans. Store data, start upload.
+    Receive user from Open Humans and store it.
     """
     logger.debug("Received user returning from Open Humans.")
 
@@ -44,10 +50,15 @@ def complete(request):
         login(request, user,
               backend='django.contrib.auth.backends.ModelBackend')
 
-        # Initiate a data transfer task, then render `complete.html`.
-        xfer_to_open_humans.delay(oh_id=oh_member.oh_id)
+        # Render `complete.html`.
         context = {'oh_id': oh_member.oh_id,
-                   'oh_proj_page': settings.OH_ACTIVITY_PAGE}
+                   'oh_proj_page': settings.OH_ACTIVITY_PAGE,
+                   'nokia_consumer_key': settings.NOKIA_CONSUMER_KEY,
+                   'nokia_callback_url': settings.NOKIA_CALLBACK_URL,
+                   'nokia_oauth_nonce': settings.NOKIA_OAUTH_NONCE,
+                   'nokia_oauth_signature': settings.NOKIA_OAUTH_SIGNATURE,
+                   'nokia_oauth_timestamp': settings.NOKIA_OAUTH_TIMESTAMP
+                   }
         return render(request, 'main/complete.html',
                       context=context)
 
