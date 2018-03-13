@@ -21,13 +21,13 @@ def index(request):
     return render(request, 'main/index.html', context=context)
 
 
-def complete_nokiahealth(request):
+def complete_nokia(request):
     logger.debug("Received user returning from Nokia Health")
 
-    return render(request, 'main/complete_nokiahealth.html')
+    return render(request, 'main/complete_nokia.html')
 
 
-def complete_oh(request):
+def complete(request):
     """
     Receive user from Open Humans. Store data, start upload.
     """
@@ -44,11 +44,11 @@ def complete_oh(request):
         login(request, user,
               backend='django.contrib.auth.backends.ModelBackend')
 
-        # Initiate a data transfer task, then render `complete_oh.html`.
+        # Initiate a data transfer task, then render `complete.html`.
         xfer_to_open_humans.delay(oh_id=oh_member.oh_id)
         context = {'oh_id': oh_member.oh_id,
                    'oh_proj_page': settings.OH_ACTIVITY_PAGE}
-        return render(request, 'main/complete_oh.html',
+        return render(request, 'main/complete.html',
                       context=context)
 
     logger.debug('Invalid code exchange. User returned to starting page.')
@@ -65,7 +65,7 @@ def oh_code_to_member(code):
         data = {
             'grant_type': 'authorization_code',
             'redirect_uri':
-            '{}/complete_oh'.format(settings.OPENHUMANS_APP_BASE_URL),
+            '{}/complete'.format(settings.OPENHUMANS_APP_BASE_URL),
             'code': code,
         }
         req = requests.post(

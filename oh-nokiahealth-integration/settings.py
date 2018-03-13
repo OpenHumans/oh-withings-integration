@@ -44,7 +44,7 @@ OPENHUMANS_OH_BASE_URL = 'https://www.openhumans.org'
 
 OH_API_BASE = OPENHUMANS_OH_BASE_URL + '/api/direct-sharing'
 OH_DIRECT_UPLOAD = OH_API_BASE + '/project/files/upload/direct/'
-OH_DIRECT_UPLOAD_COMPLETE = OH_API_BASE + '/project/files/upload/complete_oh/'
+OH_DIRECT_UPLOAD_COMPLETE = OH_API_BASE + '/project/files/upload/complete/'
 OH_DELETE_FILES = OH_API_BASE + '/project/files/delete/'
 
 # Application definition
