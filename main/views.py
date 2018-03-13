@@ -31,6 +31,8 @@ def complete_nokia(request):
     token_key = request.GET.get('oauth_token', '')
     token_secret = request.GET.get('oauth_token_secret', '')
 
+    access_token = nokia_get_access_token(key=token_key, secret=token_secret)
+
     # Initiate a data transfer task, then render `complete.html`.
     xfer_to_open_humans.delay(oh_id=oh_member.oh_id,
                               nokia_id=nokia_member.nokia_id)
@@ -137,3 +139,16 @@ def oh_get_member_data(token):
         return req.json()
     raise Exception('Status code {}'.format(req.status_code))
     return None
+
+def nokia_get_access_token(key, secret):
+    """
+    Exchange key and secret for access token.
+    """
+    https://developer.health.nokia.com/account/access_token
+    ?oauth_consumer_key={{ NOKIA_CONSUMER_KEY }}
+    &oauth_nonce={{ NOKIA_OAUTH_NONCE }}
+    &oauth_signature={{ NOKIA_OAUTH_SIGNATURE }}
+    &oauth_signature_method=HMAC-SHA1
+    &oauth_timestamp={{ NOKIA_OAUTH_TIMESTAMP }}
+    &oauth_token=808976772931d191e2cb5229472f41cfe87c1df04d67478e7866f50e173
+    &oauth_version=1.0
