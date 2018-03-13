@@ -27,8 +27,13 @@ def complete_nokia(request):
     """
     logger.debug("Received user returning from Nokia Health")
 
+    # Use the token key and secret to perform end-user authorization.
+    token_key = request.GET.get('oauth_token', '')
+    token_secret = request.GET.get('oauth_token_secret', '')
+
     # Initiate a data transfer task, then render `complete.html`.
-    xfer_to_open_humans.delay(oh_id=oh_member.oh_id)
+    xfer_to_open_humans.delay(oh_id=oh_member.oh_id,
+                              nokia_id=nokia_member.nokia_id)
 
     return render(request, 'main/complete_nokia.html')
 
