@@ -52,8 +52,9 @@
           {% if nokia_consumer_key %}
           <a
             class="btn btn-primary btn-lg"
+
             href="https://developer.health.nokia.com/account/request_token?
-                  oauth_callback=http%3A%2F%2Fexample.com%2Fget_access_token
+                  oauth_callback={{ nokia_callback_url }}
                   &oauth_consumer_key={{ nokia_consumer_key }}
                   &oauth_nonce={{ nokia_oauth_nonce }}
                   &oauth_signature={{ nokia_oauth_signature }}
