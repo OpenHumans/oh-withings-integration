@@ -58,7 +58,7 @@ def complete(request):
         login(request, user,
               backend='django.contrib.auth.backends.ModelBackend')
 
-        nokia_oauth_timestamp = int(time.time())
+        nokia_oauth_timestamp = create_nokia_timestamp()
         nokia_oauth_nonce = create_nokia_nonce()
         nokia_oauth_signature = create_nokia_oauth_signature()
 
@@ -147,7 +147,25 @@ def oh_get_member_data(token):
 
 
 def create_nokia_nonce(length=8):
+    """
+    Random string that should be different for every request.
+    """
     secrets.token_hex(length)
+
+
+def create_nokia_oauth_signature():
+    """
+    OAuth signature. Computed using hmac-sha1 on the oAuth base string,
+    then base64 & url-encode the result
+    """
+
+
+def create_nokia_timestamp():
+    """
+    Current date as unix epoch
+    """
+    int(time.time())
+
 
 
 def nokia_get_access_token(key, secret):
