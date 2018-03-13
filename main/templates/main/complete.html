@@ -34,13 +34,43 @@
         Thank you! We have your authorization from Open Humans.
       </p>
       <p>
-        This should have triggered a data transfer job that adds a demo
-        data file to Open Humans.
+        Now you can choose which data you would like to add, and link your
+        Nokia Health account:
       </p>
       <p>
-        Check this out here:
-        <a href="{{ oh_proj_page }}">{{ oh_proj_page }}</a>
-      </p>
+        <!--checkboxes for deciding which data to add from Nokia-->
+          <!--
+            will add these later, for now will just get activity
+            - activity
+            - body
+            - intraday
+            - sleep
+            - sleep summary
+            - workouts
+          -->
+
+          {% if nokia_consumer_key %}
+          <a
+            class="btn btn-primary btn-lg"
+            href="https://developer.health.nokia.com/account/request_token?
+                  oauth_callback=http%3A%2F%2Fexample.com%2Fget_access_token
+                  &oauth_consumer_key={{ nokia_consumer_key }}
+                  &oauth_nonce={{ nokia_oauth_nonce }}
+                  &oauth_signature={{ nokia_oauth_signature }}
+                  &oauth_signature_method=HMAC-SHA1
+                  &oauth_timestamp={{ nokia_oauth_timestamp }}
+                  &oauth_version=1.0"
+            {% else %}
+            class="btn btn-default disabled"
+            {% endif %}
+            >
+            Start with Nokia Health authorization
+          </a>
+          {% if not nokia_consumer_key %}
+          <p class="text-muted"><i>
+            This button is disabled because nokia_consumer_key hasn't been configured.
+          </i></p>
+          {% endif %}
     </div>
 
     <!-- Bootstrap core JavaScript
