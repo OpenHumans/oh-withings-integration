@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 
 import os
 import dj_database_url
+import time
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -46,6 +47,18 @@ OH_API_BASE = OPENHUMANS_OH_BASE_URL + '/api/direct-sharing'
 OH_DIRECT_UPLOAD = OH_API_BASE + '/project/files/upload/direct/'
 OH_DIRECT_UPLOAD_COMPLETE = OH_API_BASE + '/project/files/upload/complete/'
 OH_DELETE_FILES = OH_API_BASE + '/project/files/delete/'
+
+# Nokia Health configuration
+NOKIA_USER_PAGE = os.getenv('NOKIA_USER_PAGE')
+NOKIA_CONSUMER_KEY = os.getenv('NOKIA_CONSUMER_KEY')
+NOKIA_CONSUMER_SECRET = os.getenv('NOKIA_CONSUMER_SECRET')
+
+if REMOTE is False:
+    NOKIA_CALLBACK_URL = '127.0.0.1%2Fcomplete_nokia'
+else:
+    NOKIA_CALLBACK_URL = 'oh-nokiahealth.herokuapp.com%2Fcomplete_nokia'
+
+NOKIA_OAUTH_TIMESTAMP = int(time.time())
 
 # Application definition
 
