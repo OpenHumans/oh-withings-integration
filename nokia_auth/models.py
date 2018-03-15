@@ -7,13 +7,22 @@ class NokiaOAuth1(BaseOAuth1):
     """
     Nokia OAuth1 authentication
     """
+
+    name = 'nokiahealth'
     ID_KEY = 'userid'
+    REQUIRES_EMAIL_VALIDATION = False
     AUTH_URL = 'https://developer.health.nokia.com/account/authorize'
     REQUEST_TOKEN = 'https://developer.health.nokia.com/account/request_token'
     ACCESS_TOKEN = 'https://developer.health.nokia.com/account/access_token'
 
     def get_user_id(self, details, response):
         return response['access_token'][self.ID_KEY]
+
+    def get_user_details(self, response):
+        return {
+            'userid': response['access_token'][self.ID_KEY],
+            'email': ''  # not provided by Withings
+        }
 
 
 def create_nokia_nonce(length=8):
