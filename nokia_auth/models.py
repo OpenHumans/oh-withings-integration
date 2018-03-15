@@ -1,5 +1,6 @@
 from django.db import models
 from social.backends.oauth import BaseOAuth1
+import secrets
 
 
 class NokiaOAuth1(BaseOAuth1):
@@ -15,17 +16,25 @@ class NokiaOAuth1(BaseOAuth1):
         return response['access_token'][self.ID_KEY]
 
 
-def make_oauth_nonce():
+def create_nokia_nonce(length=8):
     """
-    Making a random string, specific to this request.
+    Random string that should be different for every request.
+    """
+    secrets.token_hex(length)
+
+
+def create_nokia_oauth_signature():
+    """
+    OAuth signature. Computed using hmac-sha1 on the oAuth base string,
+    then base64 & url-encode the result
     """
 
 
-def make_oauth_signature():
+def create_nokia_timestamp():
     """
-    Compute OAuth signature using hmac-sha1 on the oAuth base string, then
-    base64 & url-encode the result.
+    Current date as unix epoch
     """
+    int(time.time())
 
 
 class NokiaHealthMember(models.Model):
