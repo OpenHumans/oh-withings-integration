@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 # Credentials obtained during the registration.
 client_key = settings.NOKIA_CONSUMER_KEY
 client_secret = settings.NOKIA_CONSUMER_SECRET
-callback_uri = 'http://127.0.0.1:5000/complete_nokia'
+callback_uri = settings.NOKIA_CALLBACK_URL
 
 # Endpoints found in the OAuth provider API documentation
 request_token_url = 'https://developer.health.nokia.com/account/request_token'
