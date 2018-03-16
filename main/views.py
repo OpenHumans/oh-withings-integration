@@ -49,15 +49,19 @@ def complete_nokia(request):
     redirect_response = str(request.get_full_path())
 
     # 2. Parse the "fragment" from above (to separate the info in a dict)
-    # Output ex: {'userid': 'xxx', 'oauth_token': 'xxxx', 'oauth_verifier': 'xxxx'}
+    # Output ex: {'userid': 'xxx',
+    #             'oauth_token': 'xxxx',
+    #             'oauth_verifier': 'xxxx'}
     oauth_session.parse_authorization_response(redirect_response)
 
-    # 3. Last leg, use the dict from previous line to get the actual access token
-    # Output ex: {'oauth_token': 'xxxx', 'oauth_token_secret': 'xxxx', 'userid': 'xxxx', 'deviceid': 'xxxx'}
+    # 3. Last leg, use the dict from previous line to get the access token
+    # Output ex: {'oauth_token': 'xxxx',
+    #             'oauth_token_secret': 'xxxx',
+    #             'userid': 'xxxx',
+    #             'deviceid': 'xxxx'}
     tokeninfo = oauth_session.fetch_access_token(access_token_url)
 
     # 4. (not done) Trigger fetch data task & upload
-
     context = {"tokeninfo": tokeninfo}
     return render(request, 'main/complete_nokia.html', context=context)
 
