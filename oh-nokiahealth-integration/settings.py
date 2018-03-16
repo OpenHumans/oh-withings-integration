@@ -68,7 +68,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'nokia_auth.apps.NokiaAuthConfig',
     'datauploader.apps.DatauploaderConfig',
     'open_humans.apps.OpenHumansConfig',
     'main.apps.MainConfig',
