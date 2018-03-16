@@ -22,7 +22,9 @@ request_token_url = 'https://developer.health.nokia.com/account/request_token'
 authorization_url = 'https://developer.health.nokia.com/account/authorize'
 access_token_url = 'https://developer.health.nokia.com/account/access_token'
 
-oauth_session = OAuth1Session(client_key,client_secret=client_secret, callback_uri=callback_uri)
+oauth_session = OAuth1Session(client_key, client_secret=client_secret,
+                              callback_uri=callback_uri)
+
 
 def index(request):
     """
@@ -42,7 +44,7 @@ def complete_nokia(request):
 
     # Nokia OAuth last handshake steps
     # Uses requests_oauthlib
-    # 1. Get the full redirect path w/ code & verifier 
+    # 1. Get the full redirect path w/ code & verifier
     # (ex. /complete_nokia?userid=xxxx&oauth_token=xxxx&oauth_verifier=xxxx)
     redirect_response = str(request.get_full_path())
 
@@ -56,7 +58,7 @@ def complete_nokia(request):
 
     # 4. (not done) Trigger fetch data task & upload
 
-    context = { "tokeninfo" : tokeninfo }
+    context = {"tokeninfo": tokeninfo}
     return render(request, 'main/complete_nokia.html', context=context)
 
 
@@ -104,7 +106,7 @@ def complete(request):
     # 2. Generate link for user based on tokens from last line
     redirect_url = oauth_session.authorization_url(authorization_url)
     # Add Nokia Health Authorization URL to the context for the template
-    context = { "redirect_url" : redirect_url }
+    context = {"redirect_url": redirect_url}
     return render(request, 'main/complete.html', context=context)
 
 
