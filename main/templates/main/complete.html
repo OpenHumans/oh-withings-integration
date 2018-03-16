@@ -48,33 +48,27 @@
             - sleep summary
             - workouts
           -->
-          
-          
-          <a class="btn btn-primary btn-lg" href="{{redirect_url}}"> Start with Nokia Health authorization</a>
-          
-       <!--    {% if nokia_consumer_key %}
+
+          {% if nokia_consumer_key %}
           <a
             class="btn btn-primary btn-lg"
 
-            href="https://developer.health.nokia.com/account/request_token?
-                  oauth_callback={{ nokia_callback_url }}
-                  &oauth_consumer_key={{ nokia_consumer_key }}
-                  &oauth_nonce={{ nokia_oauth_nonce }}
-                  &oauth_signature={{ nokia_oauth_signature }}
-                  &oauth_signature_method=HMAC-SHA1
-                  &oauth_timestamp={{ nokia_oauth_timestamp }}
-                  &oauth_version=1.0"
+            href="{{redirect_url}}"
+
             {% else %}
+
             class="btn btn-default disabled"
+
             {% endif %}
             >
             Start with Nokia Health authorization
           </a>
+          
           {% if not nokia_consumer_key %}
           <p class="text-muted"><i>
             This button is disabled because nokia_consumer_key hasn't been configured.
           </i></p>
-          {% endif %} -->
+          {% endif %}
     </div>
 
     <!-- Bootstrap core JavaScript
