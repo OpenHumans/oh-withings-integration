@@ -1,6 +1,5 @@
 import logging
 import requests
-import secrets
 
 from django.contrib.auth import login
 from django.shortcuts import render, redirect
@@ -175,38 +174,3 @@ def oh_get_member_data(token):
         return req.json()
     raise Exception('Status code {}'.format(req.status_code))
     return None
-
-
-def create_nokia_nonce(length=8):
-    """
-    Random string that should be different for every request.
-    """
-    secrets.token_hex(length)
-
-
-def create_nokia_oauth_signature():
-    """
-    OAuth signature. Computed using hmac-sha1 on the oAuth base string,
-    then base64 & url-encode the result
-    """
-
-
-def create_nokia_timestamp():
-    """
-    Current date as unix epoch
-    """
-    int(time.time())
-
-
-def nokia_get_access_token(key, secret):
-    """
-    Exchange key and secret for access token.
-    """
-    # https://developer.health.nokia.com/account/access_token
-    # ?oauth_consumer_key={{ NOKIA_CONSUMER_KEY }}
-    # &oauth_nonce={{ NOKIA_OAUTH_NONCE }}
-    # &oauth_signature={{ NOKIA_OAUTH_SIGNATURE }}
-    # &oauth_signature_method=HMAC-SHA1
-    # &oauth_timestamp={{ NOKIA_OAUTH_TIMESTAMP }}
-    # &oauth_token=808976772931d191e2cb5229472f41cfe87c1df04d67478e7866f50e173
-    # &oauth_version=1.0
