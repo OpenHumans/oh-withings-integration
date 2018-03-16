@@ -6,11 +6,24 @@ from django.contrib.auth import login
 from django.shortcuts import render, redirect
 from django.conf import settings
 from datauploader.tasks import xfer_to_open_humans
+from requests_oauthlib import OAuth1Session
 from open_humans.models import OpenHumansMember
 
 # Set up logging.
 logger = logging.getLogger(__name__)
 
+# OAuth1 for Nokia Health
+# Credentials obtained during the registration.
+client_key = settings.NOKIA_CONSUMER_KEY
+client_secret = settings.NOKIA_CONSUMER_SECRET
+callback_uri = 'http://127.0.0.1:5000/complete_nokia'
+
+# Endpoints found in the OAuth provider API documentation
+request_token_url = 'https://developer.health.nokia.com/account/request_token'
+authorization_url = 'https://developer.health.nokia.com/account/authorize'
+access_token_url = 'https://developer.health.nokia.com/account/access_token'
+
+oauth_session = OAuth1Session(client_key,client_secret=client_secret, callback_uri=callback_uri)
 
 def index(request):
     """
@@ -28,17 +41,24 @@ def complete_nokia(request):
     """
     logger.debug("Received user returning from Nokia Health")
 
-    # Use the token key and secret to perform end-user authorization.
-    token_key = request.GET.get('oauth_token', '')
-    token_secret = request.GET.get('oauth_token_secret', '')
+    # Nokia OAuth last handshake steps
+    # Uses requests_oauthlib
+    # 1. Get the full redirect path w/ code & verifier 
+    # (ex. /complete_nokia?userid=xxxx&oauth_token=xxxx&oauth_verifier=xxxx)
+    redirect_response = str(request.get_full_path())
 
-    access_token = nokia_get_access_token(key=token_key, secret=token_secret)
+    # 2. Parse the "fragment" from above (to separate the info in a dict)
+    # Output ex: {'userid': 'xxx', 'oauth_token': 'xxxx', 'oauth_verifier': 'xxxx'}
+    oauth_session.parse_authorization_response(redirect_response)
 
-    # Initiate a data transfer task, then render `complete.html`.
-    xfer_to_open_humans.delay(oh_id=oh_member.oh_id,
-                              nokia_id=nokia_member.nokia_id)
+    # 3. Last leg, use the dict from previous line to get the actual access token
+    # Output ex: {'oauth_token': 'xxxx', 'oauth_token_secret': 'xxxx', 'userid': 'xxxx', 'deviceid': 'xxxx'}
+    tokeninfo = oauth_session.fetch_access_token(access_token_url)
 
-    return render(request, 'main/complete_nokia.html')
+    # 4. (not done) Trigger fetch data task & upload
+
+    context = { "tokeninfo" : tokeninfo }
+    return render(request, 'main/complete_nokia.html', context=context)
 
 
 def complete(request):
@@ -49,33 +69,44 @@ def complete(request):
 
     # Exchange code for token.
     # This creates an OpenHumansMember and associated user account.
-    code = request.GET.get('code', '')
-    oh_member = oh_code_to_member(code=code)
+    # code = request.GET.get('code', '')
+    # oh_member = oh_code_to_member(code=code)
 
-    if oh_member:
-        # Log in the user.
-        user = oh_member.user
-        login(request, user,
-              backend='django.contrib.auth.backends.ModelBackend')
+    # if oh_member:
+    #     # Log in the user.
+    #     user = oh_member.user
+    #     login(request, user,
+    #           backend='django.contrib.auth.backends.ModelBackend')
 
-        nokia_oauth_timestamp = create_nokia_timestamp()
-        nokia_oauth_nonce = create_nokia_nonce()
-        nokia_oauth_signature = create_nokia_oauth_signature()
+    #     nokia_oauth_timestamp = create_nokia_timestamp()
+    #     nokia_oauth_nonce = create_nokia_nonce()
+    #     nokia_oauth_signature = create_nokia_oauth_signature()
 
-        # Render `complete.html`.
-        context = {'oh_id': oh_member.oh_id,
-                   'oh_proj_page': settings.OH_ACTIVITY_PAGE,
-                   'nokia_consumer_key': settings.NOKIA_CONSUMER_KEY,
-                   'nokia_callback_url': settings.NOKIA_CALLBACK_URL,
-                   'nokia_oauth_nonce': nokia_oauth_nonce,
-                   'nokia_oauth_signature': nokia_oauth_signature,
-                   'nokia_oauth_timestamp': nokia_oauth_timestamp
-                   }
-        return render(request, 'main/complete.html',
-                      context=context)
+    #     # Render `complete.html`.
+    #     context = {'oh_id': oh_member.oh_id,
+    #                'oh_proj_page': settings.OH_ACTIVITY_PAGE,
+    #                'nokia_consumer_key': settings.NOKIA_CONSUMER_KEY,
+    #                'nokia_callback_url': settings.NOKIA_CALLBACK_URL,
+    #                'nokia_oauth_nonce': nokia_oauth_nonce,
+    #                'nokia_oauth_signature': nokia_oauth_signature,
+    #                'nokia_oauth_timestamp': nokia_oauth_timestamp
+    #                }
+    #     return render(request, 'main/complete.html',
+    #                   context=context)
 
-    logger.debug('Invalid code exchange. User returned to starting page.')
-    return redirect('/')
+    # logger.debug('Invalid code exchange. User returned to starting page.')
+    # return redirect('/')
+
+    # Start OAuth1 handshake to generate authorization URL for user
+    # 1. Fetch the request token.
+    # Output ex: oauth_token=xxxx&oauth_token_secret=xxxx
+    oauth_session.fetch_request_token(request_token_url)
+
+    # 2. Generate link for user based on tokens from last line
+    redirect_url = oauth_session.authorization_url(authorization_url)
+    # Add Nokia Health Authorization URL to the context for the template
+    context = { "redirect_url" : redirect_url }
+    return render(request, 'main/complete.html', context=context)
 
 
 def oh_code_to_member(code):
@@ -167,16 +198,15 @@ def create_nokia_timestamp():
     int(time.time())
 
 
-
 def nokia_get_access_token(key, secret):
     """
     Exchange key and secret for access token.
     """
-    https://developer.health.nokia.com/account/access_token
-    ?oauth_consumer_key={{ NOKIA_CONSUMER_KEY }}
-    &oauth_nonce={{ NOKIA_OAUTH_NONCE }}
-    &oauth_signature={{ NOKIA_OAUTH_SIGNATURE }}
-    &oauth_signature_method=HMAC-SHA1
-    &oauth_timestamp={{ NOKIA_OAUTH_TIMESTAMP }}
-    &oauth_token=808976772931d191e2cb5229472f41cfe87c1df04d67478e7866f50e173
-    &oauth_version=1.0
+    # https://developer.health.nokia.com/account/access_token
+    # ?oauth_consumer_key={{ NOKIA_CONSUMER_KEY }}
+    # &oauth_nonce={{ NOKIA_OAUTH_NONCE }}
+    # &oauth_signature={{ NOKIA_OAUTH_SIGNATURE }}
+    # &oauth_signature_method=HMAC-SHA1
+    # &oauth_timestamp={{ NOKIA_OAUTH_TIMESTAMP }}
+    # &oauth_token=808976772931d191e2cb5229472f41cfe87c1df04d67478e7866f50e173
+    # &oauth_version=1.0
