@@ -68,50 +68,41 @@ def complete_nokia(request):
 
 def complete(request):
     """
-    Receive user from Open Humans and store it.
+    Receive user from Open Humans and store.
     """
     logger.debug("Received user returning from Open Humans.")
 
     # Exchange code for token.
     # This creates an OpenHumansMember and associated user account.
-    # code = request.GET.get('code', '')
-    # oh_member = oh_code_to_member(code=code)
+    code = request.GET.get('code', '')
+    oh_member = oh_code_to_member(code=code)
 
-    # if oh_member:
-    #     # Log in the user.
-    #     user = oh_member.user
-    #     login(request, user,
-    #           backend='django.contrib.auth.backends.ModelBackend')
+    if oh_member:
+        # Log in the user.
+        user = oh_member.user
+        login(request, user,
+              backend='django.contrib.auth.backends.ModelBackend')
 
-    #     nokia_oauth_timestamp = create_nokia_timestamp()
-    #     nokia_oauth_nonce = create_nokia_nonce()
-    #     nokia_oauth_signature = create_nokia_oauth_signature()
+        # Start OAuth1 handshake to generate authorization URL for user
+        # 1. Fetch the request token.
+        # Output ex: oauth_token=xxxx&oauth_token_secret=xxxx
+        oauth_session.fetch_request_token(request_token_url)
 
-    #     # Render `complete.html`.
-    #     context = {'oh_id': oh_member.oh_id,
-    #                'oh_proj_page': settings.OH_ACTIVITY_PAGE,
-    #                'nokia_consumer_key': settings.NOKIA_CONSUMER_KEY,
-    #                'nokia_callback_url': settings.NOKIA_CALLBACK_URL,
-    #                'nokia_oauth_nonce': nokia_oauth_nonce,
-    #                'nokia_oauth_signature': nokia_oauth_signature,
-    #                'nokia_oauth_timestamp': nokia_oauth_timestamp
-    #                }
-    #     return render(request, 'main/complete.html',
-    #                   context=context)
+        # 2. Generate link for user based on tokens from last line
+        redirect_url = oauth_session.authorization_url(authorization_url)
+        # Add Nokia Health Authorization URL to the context for the template
 
-    # logger.debug('Invalid code exchange. User returned to starting page.')
-    # return redirect('/')
+        # Render `complete.html`.
+        context = {'oh_id': oh_member.oh_id,
+                   'oh_proj_page': settings.OH_ACTIVITY_PAGE,
+                   "redirect_url": redirect_url,
+                   'nokia_consumer_key': settings.NOKIA_CONSUMER_KEY,
+                   'nokia_callback_url': settings.NOKIA_CALLBACK_URL,
+                   }
+        return render(request, 'main/complete.html', context=context)
 
-    # Start OAuth1 handshake to generate authorization URL for user
-    # 1. Fetch the request token.
-    # Output ex: oauth_token=xxxx&oauth_token_secret=xxxx
-    oauth_session.fetch_request_token(request_token_url)
-
-    # 2. Generate link for user based on tokens from last line
-    redirect_url = oauth_session.authorization_url(authorization_url)
-    # Add Nokia Health Authorization URL to the context for the template
-    context = {"redirect_url": redirect_url}
-    return render(request, 'main/complete.html', context=context)
+    logger.debug('Invalid code exchange. User returned to starting page.')
+    return redirect('/')
 
 
 def oh_code_to_member(code):
