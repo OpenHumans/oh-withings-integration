@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 client_key = settings.NOKIA_CONSUMER_KEY
 client_secret = settings.NOKIA_CONSUMER_SECRET
 callback_uri = settings.NOKIA_CALLBACK_URL
+oh_proj_page = settings.OH_ACTIVITY_PAGE
 
 # Endpoints found in the OAuth provider API documentation
 request_token_url = 'https://developer.health.nokia.com/account/request_token'
@@ -64,7 +65,8 @@ def complete_nokia(request):
 
     # 4. (not done) Trigger fetch data task & upload
 
-    context = {"tokeninfo": 'thanks for linking Nokia! Fetching data...'}
+    context = {'tokeninfo': 'thanks for linking Nokia! Fetching data...',
+               'oh_proj_page': oh_proj_page}
     return render(request, 'main/complete_nokia.html', context=context)
 
 
