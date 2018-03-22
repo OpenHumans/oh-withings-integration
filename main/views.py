@@ -44,12 +44,13 @@ def complete_nokia(request):
     # Get the "verifier" out of the redirected URL
     verifier = request.GET['oauth_verifier']
 
-    # Create a new OAuth1 object using the resource owner key/secret from session data
-    # and using the verifier parsed from the URL (above)
+    # Create a new OAuth1 object using the resource owner key/secret
+    # from session data and using the verifier parsed from the URL (above)
     oauth = OAuth1(client_key,
                    client_secret=client_secret,
                    resource_owner_key=request.session['resource_owner_key'],
-                   resource_owner_secret=request.session['resource_owner_secret'],
+                   resource_owner_secret=request.
+                   session['resource_owner_secret'],
                    verifier=verifier)
 
     # Make a request to Nokia (final request) for an access token
@@ -60,7 +61,6 @@ def complete_nokia(request):
     # next steps: parse and store Nokia OAuth tokens
     # oauth_token = credentials.get('oauth_token')[0]
     # oauth_token_secret = credentials.get('oauth_token_secret')[0]
-
 
     # 4. (not done) Trigger fetch data task & upload
 
@@ -86,13 +86,17 @@ def complete(request):
               backend='django.contrib.auth.backends.ModelBackend')
 
         # Create an OAuth1 object, and obtain a request token
-        oauth = OAuth1(client_key, client_secret=client_secret, callback_uri=callback_uri)
+        oauth = OAuth1(client_key, client_secret=client_secret,
+                       callback_uri=callback_uri)
         r = requests.post(url=request_token_url, auth=oauth)
-        
-        # Parse and save the resource owner key & secret (for use in nokia_complete callback)
+
+        # Parse and save the resource owner key & secret (for use
+        # in nokia_complete callback)
         credentials = parse_qs(r.text)
-        request.session['resource_owner_key'] = credentials.get('oauth_token')[0]
-        request.session['resource_owner_secret'] = credentials.get('oauth_token_secret')[0]
+        request.session['resource_owner_key'] =\
+            credentials.get('oauth_token')[0]
+        request.session['resource_owner_secret'] =\
+            credentials.get('oauth_token_secret')[0]
 
         # Generate the authorization URL
         authorize_url = authorization_url + '?oauth_token='
