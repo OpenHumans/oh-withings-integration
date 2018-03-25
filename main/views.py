@@ -8,6 +8,7 @@ from datauploader.tasks import xfer_to_open_humans
 from requests_oauthlib import OAuth1
 from urllib.parse import parse_qs
 from open_humans.models import OpenHumansMember
+from .models import NokiaHealthMember
 
 # Set up logging.
 logger = logging.getLogger(__name__)
@@ -58,12 +59,25 @@ def complete_nokia(request):
     r = requests.post(url=access_token_url, auth=oauth)
     print(r.text)
     credentials = parse_qs(r.text)
+    print(request.user)
 
     # next steps: parse and store Nokia OAuth tokens
-    # oauth_token = credentials.get('oauth_token')[0]
-    # oauth_token_secret = credentials.get('oauth_token_secret')[0]
 
     # 4. (not done) Trigger fetch data task & upload
+
+    oauth_token = credentials.get('oauth_token')[0]
+    oauth_token_secret = credentials.get('oauth_token_secret')[0]
+    userid = credentials.get('userid')[0]
+    deviceid = credentials.get('deviceid')[0]
+
+    oh_user = OpenHumansMember.objects.get(oh_id=request.user.oh_member.oh_id)
+
+    nokia_member = NokiaHealthMember.objects.get_or_create(
+        user=oh_user,
+        userid=userid,
+        deviceid=deviceid,
+        oauth_token=oauth_token,
+        oauth_token_secret=oauth_token_secret)
 
     context = {'tokeninfo': 'thanks for linking Nokia! Fetching data...',
                'oh_proj_page': oh_proj_page}
