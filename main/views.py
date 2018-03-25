@@ -79,6 +79,22 @@ def complete_nokia(request):
         oauth_token=oauth_token,
         oauth_token_secret=oauth_token_secret)
 
+    activity_url = "https://api.health.nokia.com/v2/measure?action=getactivity"
+    meas_url = 'https://api.health.nokia.com/measure?action=getmeas&userid=1927279'
+    # https://api.health.nokia.com/v2/measure?action=getintradayactivity
+    # https://api.health.nokia.com/v2/sleep?action=get
+    # https://api.health.nokia.com/v2/sleep?action=getsummary
+    # https://api.health.nokia.com/v2/measure?action=getworkouts
+
+    oauth = OAuth1(client_key,
+                   client_secret=client_secret,
+                   resource_owner_key=oauth_token,
+                   resource_owner_secret=oauth_token_secret)
+
+    r = requests.get(url=meas_url, auth=oauth)
+
+    print(r.text)
+
     context = {'tokeninfo': 'thanks for linking Nokia! Fetching data...',
                'oh_proj_page': oh_proj_page}
     return render(request, 'main/complete_nokia.html', context=context)
