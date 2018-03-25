@@ -80,20 +80,37 @@ def complete_nokia(request):
         oauth_token_secret=oauth_token_secret)
 
     activity_url = "https://api.health.nokia.com/v2/measure?action=getactivity"
-    meas_url = 'https://api.health.nokia.com/measure?action=getmeas&userid=1927279'
-    # https://api.health.nokia.com/v2/measure?action=getintradayactivity
-    # https://api.health.nokia.com/v2/sleep?action=get
-    # https://api.health.nokia.com/v2/sleep?action=getsummary
-    # https://api.health.nokia.com/v2/measure?action=getworkouts
+    meas_url = 'https://api.health.nokia.com/measure?action=getmeas&userid=' + str(userid)
+    intraday_url = 'https://api.health.nokia.com/v2/measure?action=getintradayactivity'
+    sleep_url = 'https://api.health.nokia.com/v2/sleep?action=get&startdate=1387234800&enddate=1387258800' + str(userid)
+    sleep_summary_url = 'https://api.health.nokia.com/v2/sleep?action=getsummary'
+    workouts_url = 'https://api.health.nokia.com/v2/measure?action=getworkouts'
 
-    oauth = OAuth1(client_key,
+    queryoauth = OAuth1(client_key,
                    client_secret=client_secret,
                    resource_owner_key=oauth_token,
-                   resource_owner_secret=oauth_token_secret)
+                   resource_owner_secret=oauth_token_secret,
+                   signature_type='query')
 
-    r = requests.get(url=meas_url, auth=oauth)
+    r_activity = requests.get(url=activity_url, auth=queryoauth)
+    r_meas = requests.get(url=meas_url, auth=queryoauth)
+    r_intraday = requests.get(url=intraday_url, auth=queryoauth)
+    r_sleep = requests.get(url=sleep_url, auth=queryoauth)
+    r_sleep_summary = requests.get(url=sleep_summary_url, auth=queryoauth)
+    r_workouts = requests.get(url=workouts_url, auth=queryoauth)
 
-    print(r.text)
+    print("Activity:")
+    print(r_activity.text)
+    print("Measure:")
+    print(r_meas.text)
+    print("Intraday:")
+    print(r_intraday.text)
+    print("Sleep:")
+    print(r_sleep.text)
+    print("Sleep Summary:")
+    print(r_sleep_summary.text)
+    print("Workouts:")
+    print(r_workouts.text)
 
     context = {'tokeninfo': 'thanks for linking Nokia! Fetching data...',
                'oh_proj_page': oh_proj_page}
