@@ -80,17 +80,21 @@ def complete_nokia(request):
         oauth_token_secret=oauth_token_secret)
 
     activity_url = "https://api.health.nokia.com/v2/measure?action=getactivity"
-    meas_url = 'https://api.health.nokia.com/measure?action=getmeas&userid=' + str(userid)
-    intraday_url = 'https://api.health.nokia.com/v2/measure?action=getintradayactivity'
-    sleep_url = 'https://api.health.nokia.com/v2/sleep?action=get&startdate=1387234800&enddate=1387258800' + str(userid)
-    sleep_summary_url = 'https://api.health.nokia.com/v2/sleep?action=getsummary'
+    meas_url = 'https://api.health.nokia.com/measure?action=\
+        getmeas&userid=' + str(userid)
+    intraday_url = 'https://api.health.nokia.com/v2/measure?action=\
+        getintradayactivity'
+    sleep_url = 'https://api.health.nokia.com/v2/sleep?action=\
+        get&startdate=1387234800&enddate=1387258800' + str(userid)
+    sleep_summary_url = 'https://api.health.nokia.com/v2/sleep?action=\
+        getsummary'
     workouts_url = 'https://api.health.nokia.com/v2/measure?action=getworkouts'
 
     queryoauth = OAuth1(client_key,
-                   client_secret=client_secret,
-                   resource_owner_key=oauth_token,
-                   resource_owner_secret=oauth_token_secret,
-                   signature_type='query')
+                        client_secret=client_secret,
+                        resource_owner_key=oauth_token,
+                        resource_owner_secret=oauth_token_secret,
+                        signature_type='query')
 
     r_activity = requests.get(url=activity_url, auth=queryoauth)
     r_meas = requests.get(url=meas_url, auth=queryoauth)
