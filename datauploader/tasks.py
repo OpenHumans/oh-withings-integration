@@ -17,7 +17,7 @@ from open_humans.models import OpenHumansMember
 
 
 @shared_task
-def xfer_to_open_humans(oh_id, num_submit=0, logger=None, **kwargs):
+def xfer_to_open_humans(nh_data, oh_id, num_submit=0, logger=None, **kwargs):
     """
     Transfer data to Open Humans.
     num_submit is an optional parameter in case you want to resubmit failed
@@ -30,7 +30,7 @@ def xfer_to_open_humans(oh_id, num_submit=0, logger=None, **kwargs):
     # Delete this even if an exception occurs.
     tempdir = tempfile.mkdtemp()
     try:
-        add_data_to_open_humans(oh_member, tempdir)
+        add_data_to_open_humans(nh_data, oh_member, tempdir)
     finally:
         shutil.rmtree(tempdir)
 
@@ -44,7 +44,7 @@ def xfer_to_open_humans(oh_id, num_submit=0, logger=None, **kwargs):
     #     return
 
 
-def add_data_to_open_humans(oh_member, tempdir):
+def add_data_to_open_humans(nh_data, oh_member, tempdir):
     """
     Add demonstration file to Open Humans.
     This might be a good place to start editing, to add your own project data.
@@ -52,8 +52,8 @@ def add_data_to_open_humans(oh_member, tempdir):
     will be cleaned up later. You can use the tempdir to stage the creation of
     files you plan to upload to Open Humans.
     """
-    # Create example file.
-    data_filepath, data_metadata = make_example_datafile(tempdir)
+    # Create data file.
+    data_filepath, data_metadata = make_datafile(nh_data, tempdir)
 
     # Remove any files with this name previously added to Open Humans.
     delete_oh_file_by_name(oh_member, filename=os.path.basename(data_filepath))
@@ -62,18 +62,17 @@ def add_data_to_open_humans(oh_member, tempdir):
     upload_file_to_oh(oh_member, data_filepath, data_metadata)
 
 
-def make_example_datafile(tempdir):
+def make_datafile(nh_data, tempdir):
     """
-    Make a lorem-ipsum file in the tempdir, for demonstration purposes.
+    Make a Nokia Health data file in the tempdir.
     """
-    filepath = os.path.join(tempdir, 'example_data.txt')
-    paras = lorem_ipsum.paragraphs(3, common=True)
-    output_text = '\n'.join(['\n'.join(textwrap.wrap(p)) for p in paras])
+    filepath = os.path.join(tempdir, 'nh_data.txt')
+
     with open(filepath, 'w') as f:
-        f.write(output_text)
+        f.write(nh_data)
     metadata = {
-        'tags': ['example', 'text', 'demo'],
-        'description': 'File with lorem ipsum text for demonstration purposes',
+        'tags': ['nokiahealth', 'health', 'measure'],
+        'description': 'File with Nokia Health data',
     }
     return filepath, metadata
 
