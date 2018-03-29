@@ -113,11 +113,26 @@ def complete_nokia(request):
     print("Workouts:")
     print(r_workouts.text)
 
-    xfer_to_open_humans.delay(r_meas.text, oh_id=oh_id)
+    dataarray = [r_activity, r_meas, r_intraday, r_sleep,
+                 r_sleep_summary, r_workouts]
+    datastring = combine_nh_data(dataarray)
+
+    xfer_to_open_humans.delay(datastring, oh_id=oh_id)
 
     context = {'tokeninfo': 'thanks for linking Nokia! Fetching data...',
                'oh_proj_page': oh_proj_page}
     return render(request, 'main/complete_nokia.html', context=context)
+
+
+def combine_nh_data(dataarray):
+    """
+    Combine Nokia Health data for all endpoints (activity, measure, intraday,
+    sleep, sleep summary, workouts) into a single string.
+    """
+    datastring = ""
+
+    return datastring
+
 
 
 def complete(request):
