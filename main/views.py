@@ -103,8 +103,9 @@ def complete_nokia(request):
     dataarray = [r_activity.text, r_meas.text, r_intraday.text, r_sleep.text,
                  r_sleep_summary.text, r_workouts.text]
     datastring = combine_nh_data(dataarray)
-
-    xfer_to_open_humans.delay(datastring, oh_id=oh_id)
+    print("datastring")
+    print(datastring[0:100])
+    xfer_to_open_humans(datastring, oh_id=oh_id)
 
     context = {'tokeninfo': 'thanks for linking Nokia! Fetching data...',
                'oh_proj_page': oh_proj_page}
@@ -124,9 +125,6 @@ def combine_nh_data(dataarray):
         datastring += endpoints[i] + dataarray[i]
 
     datastring += '}'
-    print("datastring")
-    print(datastring[0:100])
-    print("test")
     return datastring
 
 

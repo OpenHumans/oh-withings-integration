@@ -26,8 +26,12 @@ def xfer_to_open_humans(nh_data, oh_id, num_submit=0, logger=None, **kwargs):
 
     # Make a tempdir for all temporary files.
     # Delete this even if an exception occurs.
+    print("nh_data")
+    print(nh_data[0:100])
     tempdir = tempfile.mkdtemp()
     try:
+        print("nh_data")
+        print(nh_data[0:100])
         add_data_to_open_humans(nh_data, oh_member, tempdir)
     finally:
         shutil.rmtree(tempdir)
