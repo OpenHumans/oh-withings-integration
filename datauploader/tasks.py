@@ -8,10 +8,8 @@ import os
 import json
 import shutil
 import tempfile
-import textwrap
 import requests
 from celery import shared_task
-from django.utils import lorem_ipsum
 from django.conf import settings
 from open_humans.models import OpenHumansMember
 
@@ -66,7 +64,7 @@ def make_datafile(nh_data, tempdir):
     """
     Make a Nokia Health data file in the tempdir.
     """
-    filepath = os.path.join(tempdir, 'nh_data.txt')
+    filepath = os.path.join(tempdir, 'nh_data.json')
 
     with open(filepath, 'w') as f:
         f.write(nh_data)

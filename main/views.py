@@ -70,7 +70,7 @@ def complete_nokia(request):
     userid = credentials.get('userid')[0]
     deviceid = credentials.get('deviceid')[0]
 
-    oh_id=request.user.oh_member.oh_id
+    oh_id = request.user.oh_member.oh_id
     oh_user = OpenHumansMember.objects.get(oh_id=oh_id)
 
     nokia_member = NokiaHealthMember.objects.get_or_create(
@@ -100,21 +100,8 @@ def complete_nokia(request):
     r_sleep_summary = requests.get(url=sleep_summary_url, auth=queryoauth)
     r_workouts = requests.get(url=workouts_url, auth=queryoauth)
 
-    print("Activity:")
-    print(r_activity.text)
-    print("Measure:")
-    print(r_meas.text)
-    print("Intraday:")
-    print(r_intraday.text)
-    print("Sleep:")
-    print(r_sleep.text)
-    print("Sleep Summary:")
-    print(r_sleep_summary.text)
-    print("Workouts:")
-    print(r_workouts.text)
-
-    dataarray = [r_activity, r_meas, r_intraday, r_sleep,
-                 r_sleep_summary, r_workouts]
+    dataarray = [r_activity.text, r_meas.text, r_intraday.text, r_sleep.text,
+                 r_sleep_summary.text, r_workouts.text]
     datastring = combine_nh_data(dataarray)
 
     xfer_to_open_humans.delay(datastring, oh_id=oh_id)
@@ -129,10 +116,18 @@ def combine_nh_data(dataarray):
     Combine Nokia Health data for all endpoints (activity, measure, intraday,
     sleep, sleep summary, workouts) into a single string.
     """
-    datastring = ""
+    endpoints = ['"activity":', ',"measure":', ',"intraday":',
+                 ',"sleep":', ',"sleepsummary":', ',"workouts":']
 
+    datastring = '{'
+    for i in range(0, len(endpoints)-1):
+        datastring += endpoints[i] + dataarray[i]
+
+    datastring += '}'
+    print("datastring")
+    print(datastring[0:100])
+    print("test")
     return datastring
-
 
 
 def complete(request):
