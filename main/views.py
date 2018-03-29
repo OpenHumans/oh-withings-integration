@@ -105,7 +105,7 @@ def complete_nokia(request):
     datastring = combine_nh_data(dataarray)
     print("datastring")
     print(datastring[0:100])
-    xfer_to_open_humans(datastring, oh_id=oh_id)
+    xfer_to_open_humans.delay(datastring, oh_id=oh_id)
 
     context = {'tokeninfo': 'thanks for linking Nokia! Fetching data...',
                'oh_proj_page': oh_proj_page}
