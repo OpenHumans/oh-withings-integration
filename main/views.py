@@ -113,7 +113,7 @@ def complete_nokia(request):
     print("Workouts:")
     print(r_workouts.text)
 
-    xfer_to_open_humans.delay(r_meas, oh_id=oh_id)
+    xfer_to_open_humans.delay(r_meas.text, oh_id=oh_id)
 
     context = {'tokeninfo': 'thanks for linking Nokia! Fetching data...',
                'oh_proj_page': oh_proj_page}
