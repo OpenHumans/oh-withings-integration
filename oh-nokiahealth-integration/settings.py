@@ -55,7 +55,7 @@ NOKIA_CONSUMER_SECRET = os.getenv('NOKIA_CONSUMER_SECRET')
 if REMOTE is False:
     NOKIA_CALLBACK_URL = 'http://127.0.0.1:5000/complete_nokia'
 else:
-    NOKIA_CALLBACK_URL = 'oh-nokiahealth-integration.herokuapp.com%2Fcomplete_nokia'
+    NOKIA_CALLBACK_URL = 'http://oh-nokiahealth-integration.herokuapp.com/complete_nokia'
 
 # Application definition
 
