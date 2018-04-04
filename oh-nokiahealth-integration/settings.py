@@ -68,7 +68,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'raven.contrib.django.raven_compat'
+    'raven.contrib.django.raven_compat',
 
     'datauploader.apps.DatauploaderConfig',
     'open_humans.apps.OpenHumansConfig',
@@ -205,8 +205,8 @@ USE_TZ = True
 # Setry/Raven setup for error tracking
 
 RAVEN_CONFIG = {
-    'dsn': 'https://4d28acd2dfd9469d959239e01a0c604a:a19c8a470e504fd981fe11a32fe9dc60@sentry.io/1072776',
-    'release': raven.fetch_git_sha(os.path.abspath(os.pardir)),
+    'dsn': os.getenv('RAVEN_DSN'),
+    # 'release': raven.fetch_git_sha(os.path.abspath(os.pardir)),
     'CELERY_LOGLEVEL': logging.INFO
 }
 
