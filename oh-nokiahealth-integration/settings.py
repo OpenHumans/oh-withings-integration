@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 
 import os
 import dj_database_url
+import raven
+import logging
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -144,16 +146,44 @@ AUTH_PASSWORD_VALIDATORS = [
 # Configure logging to print Django logs to the console.
 LOGGING = {
     'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
+    'disable_existing_loggers': True,
+    'root': {
+        'level': 'WARNING',
+        'handlers': ['sentry'],
+    },
+    'formatters': {
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(module)s '
+                      '%(process)d %(thread)d %(message)s'
         },
     },
+    'handlers': {
+        'sentry': {
+            'level': 'ERROR', # To capture more than ERROR, change to WARNING, INFO, etc.
+            'class': 'raven.contrib.django.raven_compat.handlers.SentryHandler',
+            'tags': {'custom-tag': 'x'},
+        },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose'
+        }
+    },
     'loggers': {
-        'django': {
+        'django.db.backends': {
+            'level': 'ERROR',
             'handlers': ['console'],
-            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+            'propagate': False,
+        },
+        'raven': {
+            'level': 'DEBUG',
+            'handlers': ['console'],
+            'propagate': False,
+        },
+        'sentry.errors': {
+            'level': 'DEBUG',
+            'handlers': ['console'],
+            'propagate': False,
         },
     },
 }
@@ -170,6 +200,15 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
+
+
+# Setry/Raven setup for error tracking
+
+RAVEN_CONFIG = {
+    'dsn': 'https://4d28acd2dfd9469d959239e01a0c604a:a19c8a470e504fd981fe11a32fe9dc60@sentry.io/1072776',
+    'release': raven.fetch_git_sha(os.path.abspath(os.pardir)),
+    'CELERY_LOGLEVEL': logging.INFO
+}
 
 
 # Static files (CSS, JavaScript, Images)
