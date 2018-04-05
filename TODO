@@ -1,9 +1,0 @@
-Todos:
-  ☐ Uncomment the Open humans token exchange in views.py complete  
-  ☐ Adjust complete.html as necessary to only render button when OH auth is successful
-
-Cleanup/Refactor:
-  ☐ Probably can delete the nokia_auth app
-  ☐ Clean up functions in views from older OAuth1 stuff
-  ☐ Clean up models from older OAuth1 stuff
-
