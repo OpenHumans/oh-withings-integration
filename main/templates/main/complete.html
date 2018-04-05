@@ -34,21 +34,9 @@
         Thank you! We have your authorization from Open Humans.
       </p>
       <p>
-        Now you can choose which data you would like to add, and link your
-        Nokia Health account:
+        Click the button below to begin authorization with Nokia Health.
       </p>
       <p>
-        <!--checkboxes for deciding which data to add from Nokia-->
-          <!--
-            will add these later, for now will just get activity
-            - activity
-            - body
-            - intraday
-            - sleep
-            - sleep summary
-            - workouts
-          -->
-
           {% if nokia_consumer_key %}
           <a
             class="btn btn-primary btn-lg"
@@ -63,7 +51,7 @@
             >
             Start with Nokia Health authorization
           </a>
-          
+
           {% if not nokia_consumer_key %}
           <p class="text-muted"><i>
             This button is disabled because nokia_consumer_key hasn't been configured.
