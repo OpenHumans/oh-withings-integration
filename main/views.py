@@ -59,9 +59,7 @@ def complete_nokia(request):
     r = requests.post(url=access_token_url, auth=oauth)
     credentials = parse_qs(r.text)
 
-    # next steps: parse and store Nokia OAuth tokens
-
-    # 4. (not done) Trigger fetch data task & upload
+    # 4. Trigger fetch data task
 
     oauth_token = credentials.get('oauth_token')[0]
     oauth_token_secret = credentials.get('oauth_token_secret')[0]
@@ -71,19 +69,26 @@ def complete_nokia(request):
     oh_id = request.user.oh_member.oh_id
     oh_user = OpenHumansMember.objects.get(oh_id=oh_id)
 
-    nokia_member = NokiaHealthMember.objects.get_or_create(
+    NokiaHealthMember.objects.get_or_create(
         user=oh_user,
         userid=userid,
         deviceid=deviceid,
         oauth_token=oauth_token,
         oauth_token_secret=oauth_token_secret)
 
-    activity_url = "https://api.health.nokia.com/v2/measure?action=getactivity"
-    meas_url = 'https://api.health.nokia.com/measure?action=getmeas&userid=' + str(userid)
-    intraday_url = 'https://api.health.nokia.com/v2/measure?action=getintradayactivity'
-    sleep_url = 'https://api.health.nokia.com/v2/sleep?action=get&startdate=1387234800&enddate=1387258800' + str(userid)
-    sleep_summary_url = 'https://api.health.nokia.com/v2/sleep?action=getsummary'
-    workouts_url = 'https://api.health.nokia.com/v2/measure?action=getworkouts'
+    activity_url = 'https://api.health.nokia.com' +\
+                   '/v2/measure?action=getactivity'
+    meas_url = 'https://api.health.nokia.com' +\
+               '/measure?action=getmeas&userid=' + str(userid)
+    intraday_url = 'https://api.health.nokia.com' +\
+                   '/v2/measure?action=getintradayactivity'
+    sleep_url = 'https://api.health.nokia.com/v2/sleep?' +\
+                'action=get&startdate=1387234800&enddate=1387258800' +\
+                str(userid)
+    sleep_summary_url = 'https://api.health.nokia.com' +\
+                        '/v2/sleep?action=getsummary'
+    workouts_url = 'https://api.health.nokia.com' +\
+                   '/v2/measure?action=getworkouts'
 
     queryoauth = OAuth1(client_key,
                         client_secret=client_secret,
@@ -101,9 +106,12 @@ def complete_nokia(request):
     dataarray = [r_activity.text, r_meas.text, r_intraday.text, r_sleep.text,
                  r_sleep_summary.text, r_workouts.text]
     datastring = combine_nh_data(dataarray)
+
+    # 5. Upload data to Open Humans.
+
     xfer_to_open_humans.delay(datastring, oh_id=oh_id)
 
-    context = {'tokeninfo': 'thanks for linking Nokia! Fetching data...',
+    context = {'tokeninfo': 'Fetching data...',
                'oh_proj_page': oh_proj_page}
     return render(request, 'main/complete_nokia.html', context=context)
 
