@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 
 import os
 import dj_database_url
-import raven
 import logging
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -57,7 +56,8 @@ NOKIA_CONSUMER_SECRET = os.getenv('NOKIA_CONSUMER_SECRET')
 if REMOTE is False:
     NOKIA_CALLBACK_URL = 'http://127.0.0.1:5000/complete_nokia'
 else:
-    NOKIA_CALLBACK_URL = 'http://oh-nokiahealth-integration.herokuapp.com/complete_nokia'
+    NOKIA_CALLBACK_URL =\
+        'http://oh-nokiahealth-integration.herokuapp.com/complete_nokia'
 
 # Application definition
 
@@ -159,8 +159,9 @@ LOGGING = {
     },
     'handlers': {
         'sentry': {
-            'level': 'ERROR', # To capture more than ERROR, change to WARNING, INFO, etc.
-            'class': 'raven.contrib.django.raven_compat.handlers.SentryHandler',
+            'level': 'ERROR',
+            'class':
+                'raven.contrib.django.raven_compat.handlers.SentryHandler',
             'tags': {'custom-tag': 'x'},
         },
         'console': {
@@ -206,7 +207,6 @@ USE_TZ = True
 
 RAVEN_CONFIG = {
     'dsn': os.getenv('RAVEN_DSN'),
-    # 'release': raven.fetch_git_sha(os.path.abspath(os.pardir)),
     'CELERY_LOGLEVEL': logging.INFO
 }
 
