@@ -1,9 +1,10 @@
 """
-A template for an asynchronous task that updates data in Open Humans.
-This example task:
-  1. deletes any current files in OH if they match the planned upload filename
+Asynchronous tasks that update data in Open Humans.
+These tasks:
+  1. delete any current files in OH if they match the planned upload filename
   2. adds a data file
 """
+import logging
 import os
 import json
 import shutil
@@ -13,6 +14,9 @@ from celery import shared_task
 from django.conf import settings
 from open_humans.models import OpenHumansMember
 
+# Set up logging.
+logger = logging.getLogger(__name__)
+
 
 @shared_task
 def xfer_to_open_humans(nh_data, oh_id, num_submit=0, logger=None, **kwargs):
@@ -21,7 +25,9 @@ def xfer_to_open_humans(nh_data, oh_id, num_submit=0, logger=None, **kwargs):
     num_submit is an optional parameter in case you want to resubmit failed
     tasks (see comments in code).
     """
-    print('Trying to copy data for {} to Open Humans'.format(oh_id))
+
+    logger.debug('Trying to copy data for {} to Open Humans'.format(oh_id))
+
     oh_member = OpenHumansMember.objects.get(oh_id=oh_id)
 
     # Make a tempdir for all temporary files.
@@ -124,5 +130,5 @@ def upload_file_to_oh(oh_member, filepath, metadata):
               'file_id': req1.json()['id']})
     req3.raise_for_status()
 
-    print('Upload done: "{}" for member {}.'.format(
-        os.path.basename(filepath), oh_member.oh_id))
+    logger.debug('Upload done: "{}" for member {}.'.format(
+            os.path.basename(filepath), oh_member.oh_id))
