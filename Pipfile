@@ -19,11 +19,15 @@ requests-oauthlib = "*"
 whitenoise = "*"
 python-social-auth = "*"
 raven = "*"
+vcrpy = "*"
+pyyaml = "*"
 
 
 [dev-packages]
 
 pylint = "*"
+"flake8" = "*"
+
 
 
 [requires]
