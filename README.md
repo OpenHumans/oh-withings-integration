@@ -6,4 +6,4 @@ The app is live and deployed with Heroku: http://oh-nokiahealth-integration.hero
 
 This repo is based on the Open Humans [data demo template project](https://github.com/OpenHumans/oh-data-demo-template). It uses the Nokia Health [API](https://developer.health.nokia.com/api) to get personal body, sleep, and activity data.
 
-If you would like to contribute to this project, please check out our [contribution guidelines](#) and the [roadmap](#).
+If you would like to contribute to this project, please check out our [contribution guidelines](https://github.com/Treblesteph/oh-nokiahealth-integration/blob/master/CONTRIBUTING.md) and the [roadmap](https://github.com/Treblesteph/oh-nokiahealth-integration/blob/master/ROADMAP.md).
