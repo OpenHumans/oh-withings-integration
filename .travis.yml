@@ -1,10 +1,11 @@
 language: python
 python:
-    - "3.6"
-
+- '3.6'
 install:
-  - pip install pipenv
-  - pipenv install
-
+- pip install pipenv
+- pipenv install
 script:
-  - python manage.py test
+- python manage.py test
+env:
+  global:
+    secure: e+H4IpaWksLe+iajaTvnufYhEWVTAf26xXs0TJDhAdVfUR9YWse4+4eH2LeADIfY0MMlSw/ajpfeydqQLQ7p4+L6KmZXJIrH0TMVlRyJs9UkF4GYoHC6KN6BHPURE3kAMJQg+1z3DPOf/n81r/kDt9MRm92vt3/xmdwCFCE2MhzzOBJKwvRIFhUfdvCexHMEobNgrI38QDgMBcDH+GGr6/5IqS9sDLD7xI0c6pdFUkku/4gQKr2puE4i92eyzxyf73NYw40PkLEhxPv3sMTD3CWy1qWjWrad2oM2CDg8vphE6XXZ9S5wAH52mAzKV4WUKWioiDpcz/U8ZOqGsIiDbqG0wFAg8loZjBXFgPU6saiOx8JVFgXhqZicO9018GhwgK60Drp9kHc4a2xjOqm6KZUgmFLC6Zw3eT9skRrhaTzqce/GZl1B2/fABY9ts/m9M28c2iHVKOIBBl5R0UHRKiz3M8+d/Yk6J7QFlenOGDpFr+6r7VC3DQltM7zdqR2OffKF8+a46P1lqYefz0n+W3L0S/U52oDVCx56mcAzb8hze9Y2r2mFcTI+PgU7tccjdj59KxHMcUGMPreEVygZN3hahW5NoDH5k21Xmw5mVO0/uN7DtG8oUcwCB8SAFi75ehGYpCqvf44+VYUrjjwOLtjyO+S+OqZZUvJaZHVHgHs=
