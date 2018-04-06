@@ -2,7 +2,6 @@ from django.test import TestCase, Client
 import vcr
 from project_admin.models import ProjectConfiguration
 from django.core.management import call_command
-from django.conf import settings
 from open_humans.models import OpenHumansMember
 
 
@@ -12,15 +11,13 @@ class LoginTestCase(TestCase):
     """
 
     def setUp(self):
-        settings.DEBUG = True
-        settings.OPENHUMANS_APP_BASE_URL = "http://127.0.0.1"
         call_command('init_proj_config')
         project_config = ProjectConfiguration.objects.get(id=1)
-        project_config.oh_client_id = "6yNYmUlXN1wLwQFQR0lnUohR1KMeVt"
-        project_config.oh_client_secret = "Y2xpZW50aWQ6Y2xpZW50c2VjcmV0"
+        project_config.oh_client_id = ""
+        project_config.oh_client_secret = ""
         project_config.save()
 
-    @vcr.use_cassette('main/tests/fixtures/vcr_cassettes/synopsis.yaml')
+    @vcr.use_cassette()
     def test_complete(self):
         c = Client()
         self.assertEqual(0,
