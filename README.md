@@ -1,6 +1,6 @@
 # Open Humans Nokia Health data integration project
 
-[![travis](https://travis-ci.org/treblesteph/oh-nokiahealth-integration.svg?branch=master)](https://travis-ci.org/Treblesteph/oh-nokiahealth-integration.svg?branch=master)
+[![Build Status](https://travis-ci.org/Treblesteph/oh-nokiahealth-integration.svg?branch=master)](https://travis-ci.org/Treblesteph/oh-nokiahealth-integration)
 
 *This is a Django/Celery application which takes the user through authorization steps with Open Humans and Nokia Health and and then adds their Nokia Health data into their Open Humans account.*
 
