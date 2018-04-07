@@ -1,6 +1,7 @@
 import logging
 import requests
 
+from requests_respectful import RespectfulRequester
 from django.contrib.auth import login
 from django.shortcuts import render, redirect
 from django.conf import settings
@@ -24,6 +25,10 @@ oh_proj_page = settings.OH_ACTIVITY_PAGE
 request_token_url = 'https://developer.health.nokia.com/account/request_token'
 authorization_url = 'https://developer.health.nokia.com/account/authorize'
 access_token_url = 'https://developer.health.nokia.com/account/access_token'
+
+# Requests Respectful (rate limiting, waiting)
+rr = RespectfulRequester()
+rr.register_realm("Nokia", max_requests=60, timespan=60)
 
 
 def index(request):
@@ -96,16 +101,17 @@ def complete_nokia(request):
                         resource_owner_secret=oauth_token_secret,
                         signature_type='query')
 
-    r_activity = requests.get(url=activity_url, auth=queryoauth)
-    r_meas = requests.get(url=meas_url, auth=queryoauth)
-    r_intraday = requests.get(url=intraday_url, auth=queryoauth)
-    r_sleep = requests.get(url=sleep_url, auth=queryoauth)
-    r_sleep_summary = requests.get(url=sleep_summary_url, auth=queryoauth)
-    r_workouts = requests.get(url=workouts_url, auth=queryoauth)
+    r_activity = rr.get(url=activity_url, auth=queryoauth, realms=["Nokia"])
+    r_meas = rr.get(url=meas_url, auth=queryoauth, realms=["Nokia"])
+    r_intraday = rr.get(url=intraday_url, auth=queryoauth, realms=["Nokia"])
+    r_sleep = rr.get(url=sleep_url, auth=queryoauth, realms=["Nokia"])
+    r_sleep_summary = rr.get(url=sleep_summary_url, auth=queryoauth, realms=["Nokia"])
+    r_workouts = rr.get(url=workouts_url, auth=queryoauth, realms=["Nokia"])
 
     dataarray = [r_activity.text, r_meas.text, r_intraday.text, r_sleep.text,
                  r_sleep_summary.text, r_workouts.text]
     datastring = combine_nh_data(dataarray)
+    print(datastring)
 
     # 5. Upload data to Open Humans.
 
@@ -192,6 +198,7 @@ def oh_code_to_member(code):
             '{}/complete'.format(settings.OPENHUMANS_APP_BASE_URL),
             'code': code,
         }
+       
         req = requests.post(
             '{}/oauth2/token/'.format(settings.OPENHUMANS_OH_BASE_URL),
             data=data,
