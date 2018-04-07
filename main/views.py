@@ -198,7 +198,7 @@ def oh_code_to_member(code):
             '{}/complete'.format(settings.OPENHUMANS_APP_BASE_URL),
             'code': code,
         }
-        
+       
         req = requests.post(
             '{}/oauth2/token/'.format(settings.OPENHUMANS_OH_BASE_URL),
             data=data,
