@@ -28,7 +28,7 @@ class LoginTestCase(TestCase):
         c = Client()
         self.assertEqual(0,
                          OpenHumansMember.objects.all().count())
-        response = c.get("/complete", {'code': 't4HqaWYjjHeo8WvM47DHIdb9jNdwng'})
+        response = c.get("/complete", {'code': 'yourcodehere'})
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'main/complete.html')
         self.assertEqual(1,
