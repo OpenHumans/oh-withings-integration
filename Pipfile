@@ -1,12 +1,9 @@
 [[source]]
-
 url = "https://pypi.python.org/simple"
 verify_ssl = true
 name = "pypi"
 
-
 [packages]
-
 amqp = "*"
 arrow = "*"
 celery = "*"
@@ -21,15 +18,12 @@ python-social-auth = "*"
 raven = "*"
 vcrpy = "*"
 pyyaml = "*"
-
+redis = "*"
+requests-respectful = "*"
 
 [dev-packages]
-
 pylint = "*"
 "flake8" = "*"
 
-
-
 [requires]
-
 python_version = "3.6"

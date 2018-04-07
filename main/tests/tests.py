@@ -1,9 +1,15 @@
 from django.test import TestCase, Client
 import vcr
-from project_admin.models import ProjectConfiguration
-from django.core.management import call_command
 from open_humans.models import OpenHumansMember
+from django.conf import settings
 
+FILTERSET = [('access_token', 'ACCESSTOKEN')]
+
+my_vcr = vcr.VCR(path_transformer=vcr.VCR.ensure_suffix('.yaml'), 
+                 cassette_library_dir='main/tests/cassettes',
+                 # filter_headers=[('Authorization', 'XXXXXXXX')],
+                 filter_query_parameters=FILTERSET,
+                 filter_post_data_parameters=FILTERSET)
 
 class LoginTestCase(TestCase):
     """
@@ -11,18 +17,18 @@ class LoginTestCase(TestCase):
     """
 
     def setUp(self):
-        call_command('init_proj_config')
-        project_config = ProjectConfiguration.objects.get(id=1)
-        project_config.oh_client_id = ""
-        project_config.oh_client_secret = ""
-        project_config.save()
+        settings.DEBUG = True
+        settings.OPENHUMANS_APP_BASE_URL = "http://127.0.0.1"
+        # self.invalid_token = 'INVALID_TOKEN'
+        # self.master_token = 'ACCESSTOKEN'
+        # self.project_info_url = 'https://www.openhumans.org/api/direct-sharing/project/?access_token={}'
 
-    @vcr.use_cassette()
+    @my_vcr.use_cassette()
     def test_complete(self):
         c = Client()
         self.assertEqual(0,
                          OpenHumansMember.objects.all().count())
-        response = c.get("/complete", {'code': 'mytestcode'})
+        response = c.get("/complete", {'code': 't4HqaWYjjHeo8WvM47DHIdb9jNdwng'})
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'main/complete.html')
         self.assertEqual(1,

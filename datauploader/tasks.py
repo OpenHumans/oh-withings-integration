@@ -13,13 +13,14 @@ import requests
 from celery import shared_task
 from django.conf import settings
 from open_humans.models import OpenHumansMember
+from datetime import datetime
 
 # Set up logging.
 logger = logging.getLogger(__name__)
 
 
 @shared_task
-def xfer_to_open_humans(nh_data, oh_id, num_submit=0, logger=None, **kwargs):
+def xfer_to_open_humans(nh_data, oh_id, num_submit=0, **kwargs):
     """
     Transfer data to Open Humans.
     num_submit is an optional parameter in case you want to resubmit failed
@@ -70,7 +71,8 @@ def make_datafile(nh_data, tempdir):
     """
     Make a Nokia Health data file in the tempdir.
     """
-    filepath = os.path.join(tempdir, 'nh_data.json')
+    filename = 'nh_data_' + datetime.today().strftime('%Y%m%d')
+    filepath = os.path.join(tempdir, filename)
 
     with open(filepath, 'w') as f:
         f.write(nh_data)
