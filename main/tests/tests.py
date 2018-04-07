@@ -23,13 +23,13 @@ class LoginTestCase(TestCase):
         # self.master_token = 'ACCESSTOKEN'
         # self.project_info_url = 'https://www.openhumans.org/api/direct-sharing/project/?access_token={}'
 
-    @my_vcr.use_cassette()
-    def test_complete(self):
-        c = Client()
-        self.assertEqual(0,
-                         OpenHumansMember.objects.all().count())
-        response = c.get("/complete", {'code': 'yourcodehere'})
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'main/complete.html')
-        self.assertEqual(1,
-                         OpenHumansMember.objects.all().count())
+    # @my_vcr.use_cassette()
+    # def test_complete(self):
+    #     c = Client()
+    #     self.assertEqual(0,
+    #                      OpenHumansMember.objects.all().count())
+    #     response = c.get("/complete", {'code': 'yourcodehere'})
+    #     self.assertEqual(response.status_code, 200)
+    #     self.assertTemplateUsed(response, 'main/complete.html')
+    #     self.assertEqual(1,
+    #                      OpenHumansMember.objects.all().count())
