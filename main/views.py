@@ -27,20 +27,20 @@ request_token_url = 'https://developer.health.nokia.com/account/request_token'
 authorization_url = 'https://developer.health.nokia.com/account/authorize'
 access_token_url = 'https://developer.health.nokia.com/account/access_token'
 
-if settings.REMOTE is True:
-    from urllib.parse import urlparse
-    url_object = urlparse(os.getenv('REDIS_URL'))
-    logger.info('Connecting to redis at %s:%s',
-        url_object.hostname,
-        url_object.port)
-    RespectfulRequester.configure(
-        redis={
-            "host": url_object.hostname,
-            "port": url_object.port,
-            "password": url_object.password,
-            "database": 0
-        },
-        safety_threshold=5)
+# if settings.REMOTE is True:
+from urllib.parse import urlparse
+url_object = urlparse(os.getenv('REDIS_URL'))
+print('Connecting to redis at',
+    url_object.hostname,
+    url_object.port)
+RespectfulRequester.configure(
+    redis={
+        "host": url_object.hostname,
+        "port": url_object.port,
+        "password": url_object.password,
+        "database": 0
+    },
+    safety_threshold=5)
 
 # Requests Respectful (rate limiting, waiting)
 rr = RespectfulRequester()
