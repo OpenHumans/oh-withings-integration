@@ -1,5 +1,6 @@
 import logging
 import requests
+import os
 
 from requests_respectful import RespectfulRequester
 from django.contrib.auth import login
@@ -28,7 +29,7 @@ access_token_url = 'https://developer.health.nokia.com/account/access_token'
 
 if settings.REMOTE is True:
     from urllib.parse import urlparse
-    url_object = urlparse.urlparse(os.getenv('REDIS_URL'))
+    url_object = urlparse(os.getenv('REDIS_URL'))
     logger.info('Connecting to redis at %s:%s',
         url_object.hostname,
         url_object.port)
@@ -213,7 +214,7 @@ def oh_code_to_member(code):
             '{}/complete'.format(settings.OPENHUMANS_APP_BASE_URL),
             'code': code,
         }
-       
+
         req = requests.post(
             '{}/oauth2/token/'.format(settings.OPENHUMANS_OH_BASE_URL),
             data=data,
