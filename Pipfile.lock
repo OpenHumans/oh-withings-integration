@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "72062555895e0036f588498d506dda30d882643db39bc31cd65f479a65151fb5"
+            "sha256": "20db12b73a6b75e76de3482f0a005420ea8febcd8669556bf84b07d301729641"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -11,6 +11,11 @@
             {
                 "name": "pypi",
                 "url": "https://pypi.python.org/simple",
+                "verify_ssl": true
+            },
+            {
+                "name": "rrgit",
+                "url": "https://github.com/mcescalante/requests-respectful",
                 "verify_ssl": true
             }
         ]
@@ -274,7 +279,7 @@
             "hashes": [
                 "sha256:3b8e41c17795e92939eecb8fb62dad8650850131069bafff0dd1aa4c071bebca"
             ],
-            "index": "pypi",
+            "index": "rrgit",
             "version": "==0.2.0"
         },
         "six": {
