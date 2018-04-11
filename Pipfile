@@ -4,7 +4,6 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-amqp = "*"
 arrow = "*"
 celery = "*"
 dj-database-url = "*"
@@ -12,14 +11,13 @@ django = "*"
 gunicorn = "*"
 "psycopg2" = "*"
 requests = "*"
-requests-oauthlib = "*"
 whitenoise = "*"
 python-social-auth = "*"
 raven = "*"
 vcrpy = "*"
 pyyaml = "*"
 redis = "*"
-requests-respectful = { git = 'git@github.com:mcescalante/requests-respectful.git', editable = 'true' }
+requests-respectful = { git = 'https://github.com/mcescalante/requests-respectful.git', editable = 'true' }
 
 [dev-packages]
 pylint = "*"
