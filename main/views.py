@@ -90,44 +90,14 @@ def complete_nokia(request):
     oh_id = request.user.oh_member.oh_id
     oh_user = OpenHumansMember.objects.get(oh_id=oh_id)
 
-    NokiaHealthMember.objects.get_or_create(
+    nokia_member = NokiaHealthMember.objects.get_or_create(
         user=oh_user,
         userid=userid,
         deviceid=deviceid,
         oauth_token=oauth_token,
         oauth_token_secret=oauth_token_secret)
 
-    activity_url = 'https://api.health.nokia.com' +\
-                   '/v2/measure?action=getactivity'
-    meas_url = 'https://api.health.nokia.com' +\
-               '/measure?action=getmeas&userid=' + str(userid)
-    intraday_url = 'https://api.health.nokia.com' +\
-                   '/v2/measure?action=getintradayactivity'
-    sleep_url = 'https://api.health.nokia.com/v2/sleep?' +\
-                'action=get&startdate=1387234800&enddate=1387258800' +\
-                str(userid)
-    sleep_summary_url = 'https://api.health.nokia.com' +\
-                        '/v2/sleep?action=getsummary'
-    workouts_url = 'https://api.health.nokia.com' +\
-                   '/v2/measure?action=getworkouts'
-
-    queryoauth = OAuth1(client_key,
-                        client_secret=client_secret,
-                        resource_owner_key=oauth_token,
-                        resource_owner_secret=oauth_token_secret,
-                        signature_type='query')
-
-    r_activity = rr.get(url=activity_url, auth=queryoauth, realms=["Nokia"])
-    r_meas = rr.get(url=meas_url, auth=queryoauth, realms=["Nokia"])
-    r_intraday = rr.get(url=intraday_url, auth=queryoauth, realms=["Nokia"])
-    r_sleep = rr.get(url=sleep_url, auth=queryoauth, realms=["Nokia"])
-    r_sleep_summary = rr.get(url=sleep_summary_url, auth=queryoauth, realms=["Nokia"])
-    r_workouts = rr.get(url=workouts_url, auth=queryoauth, realms=["Nokia"])
-
-    dataarray = [r_activity.text, r_meas.text, r_intraday.text, r_sleep.text,
-                 r_sleep_summary.text, r_workouts.text]
-    datastring = combine_nh_data(dataarray)
-    print(datastring)
+    datastring = fetch_nokia_data(nokia_member)
 
     # 5. Upload data to Open Humans.
 
@@ -141,6 +111,40 @@ def complete_nokia(request):
     context = {'tokeninfo': 'Fetching data...',
                'oh_proj_page': oh_proj_page}
     return render(request, 'main/complete_nokia.html', context=context)
+
+
+def fetch_nokia_data(nokia_member):
+    activity_url = 'https://api.health.nokia.com' +\
+                   '/v2/measure?action=getactivity'
+    meas_url = 'https://api.health.nokia.com' +\
+               '/measure?action=getmeas&userid=' + str(nokia_member.userid)
+    intraday_url = 'https://api.health.nokia.com' +\
+                   '/v2/measure?action=getintradayactivity'
+    sleep_url = 'https://api.health.nokia.com/v2/sleep?' +\
+                'action=get&startdate=1387234800&enddate=1387258800' +\
+                str(nokia_member.userid)
+    sleep_summary_url = 'https://api.health.nokia.com' +\
+                        '/v2/sleep?action=getsummary'
+    workouts_url = 'https://api.health.nokia.com' +\
+                   '/v2/measure?action=getworkouts'
+
+    queryoauth = OAuth1(client_key,
+                        client_secret=client_secret,
+                        resource_owner_key=nokia_member.oauth_token,
+                        resource_owner_secret=nokia_member.oauth_token_secret,
+                        signature_type='query')
+
+    r_activity = rr.get(url=activity_url, auth=queryoauth, realms=["Nokia"])
+    r_meas = rr.get(url=meas_url, auth=queryoauth, realms=["Nokia"])
+    r_intraday = rr.get(url=intraday_url, auth=queryoauth, realms=["Nokia"])
+    r_sleep = rr.get(url=sleep_url, auth=queryoauth, realms=["Nokia"])
+    r_sleep_summary = rr.get(url=sleep_summary_url, auth=queryoauth, realms=["Nokia"])
+    r_workouts = rr.get(url=workouts_url, auth=queryoauth, realms=["Nokia"])
+
+    dataarray = [r_activity.text, r_meas.text, r_intraday.text, r_sleep.text,
+                 r_sleep_summary.text, r_workouts.text]
+    datastring = combine_nh_data(dataarray)
+    return datastring
 
 
 def combine_nh_data(dataarray):
