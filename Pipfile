@@ -3,11 +3,6 @@ url = "https://pypi.python.org/simple"
 verify_ssl = true
 name = "pypi"
 
-[[source]]
-url = "https://github.com/mcescalante/requests-respectful"
-verify_ssl = true
-name = "rrgit"
-
 [packages]
 amqp = "*"
 arrow = "*"
@@ -24,7 +19,7 @@ raven = "*"
 vcrpy = "*"
 pyyaml = "*"
 redis = "*"
-requests-respectful = {version="*", index="rrgit"}
+requests-respectful = { git = 'git@github.com:mcescalante/requests-respectful.git', editable = 'true' }
 
 [dev-packages]
 pylint = "*"
