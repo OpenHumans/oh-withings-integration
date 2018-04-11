@@ -131,7 +131,12 @@ def complete_nokia(request):
 
     # 5. Upload data to Open Humans.
 
-    xfer_to_open_humans.delay(datastring, oh_id=oh_id)
+    metadata = {
+        'tags': ['nokiahealth', 'health', 'measure'],
+        'description': 'File with Nokia Health data',
+    }
+
+    xfer_to_open_humans.delay(datastring, metadata, oh_id=oh_id)
 
     context = {'tokeninfo': 'Fetching data...',
                'oh_proj_page': oh_proj_page}
