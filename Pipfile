@@ -1,9 +1,12 @@
 [[source]]
+
 url = "https://pypi.python.org/simple"
 verify_ssl = true
 name = "pypi"
 
+
 [packages]
+
 arrow = "*"
 celery = "*"
 dj-database-url = "*"
@@ -18,10 +21,15 @@ vcrpy = "*"
 pyyaml = "*"
 redis = "*"
 requests-respectful = { git = 'https://github.com/mcescalante/requests-respectful.git', editable = 'true' }
+schedule = "*"
+
 
 [dev-packages]
+
 pylint = "*"
 "flake8" = "*"
 
+
 [requires]
+
 python_version = "3.6"

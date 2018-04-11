@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "90301e140d39a738e8c11f8f3ddc56f255f9ef054b6545eb155eb830d382d7ab"
+            "sha256": "4fe3996b15de3bf4d08b6c4f142efb1ae9856d6bc87c3b98c3cb9fef81574289"
         },
         "host-environment-markers": {
             "implementation_name": "cpython",
@@ -264,8 +264,16 @@
             "version": "==0.8.0"
         },
         "requests-respectful": {
-            "editable": "true",
-            "git": "https://github.com/mcescalante/requests-respectful.git"
+            "editable": true,
+            "git": "https://github.com/mcescalante/requests-respectful.git",
+            "ref": "d0f3e5328631130f14518c583d6b67790bd8f39e"
+        },
+        "schedule": {
+            "hashes": [
+                "sha256:a24e75fc5e5acbd204049d55329e39a2a9a3479bca2e34c7fde81386c9d8d2fa",
+                "sha256:1003a07c2dce12828c25a03a611a7371cedfa956e5f1b4abc32bcc94eb5a335b"
+            ],
+            "version": "==0.5.0"
         },
         "six": {
             "hashes": [
