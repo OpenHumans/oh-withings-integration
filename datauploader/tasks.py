@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 
 @shared_task
-def xfer_to_open_humans(nh_data, oh_id, num_submit=0, **kwargs):
+def xfer_to_open_humans(user_data, metadata, oh_id, num_submit=0, **kwargs):
     """
     Transfer data to Open Humans.
     num_submit is an optional parameter in case you want to resubmit failed
@@ -35,7 +35,7 @@ def xfer_to_open_humans(nh_data, oh_id, num_submit=0, **kwargs):
     # Delete this even if an exception occurs.
     tempdir = tempfile.mkdtemp()
     try:
-        add_data_to_open_humans(nh_data, oh_member, tempdir)
+        add_data_to_open_humans(user_data, metadata, oh_member, tempdir)
     finally:
         shutil.rmtree(tempdir)
 
@@ -49,7 +49,7 @@ def xfer_to_open_humans(nh_data, oh_id, num_submit=0, **kwargs):
     #     return
 
 
-def add_data_to_open_humans(nh_data, oh_member, tempdir):
+def add_data_to_open_humans(user_data, metadata, oh_member, tempdir):
     """
     Add demonstration file to Open Humans.
     This might be a good place to start editing, to add your own project data.
@@ -58,7 +58,7 @@ def add_data_to_open_humans(nh_data, oh_member, tempdir):
     files you plan to upload to Open Humans.
     """
     # Create data file.
-    data_filepath, data_metadata = make_datafile(nh_data, tempdir)
+    data_filepath, data_metadata = make_datafile(user_data, metadata, tempdir)
 
     # Remove any files with this name previously added to Open Humans.
     delete_oh_file_by_name(oh_member, filename=os.path.basename(data_filepath))
@@ -67,19 +67,16 @@ def add_data_to_open_humans(nh_data, oh_member, tempdir):
     upload_file_to_oh(oh_member, data_filepath, data_metadata)
 
 
-def make_datafile(nh_data, tempdir):
+def make_datafile(user_data, metadata, tempdir):
     """
-    Make a Nokia Health data file in the tempdir.
+    Make a user data file in the tempdir.
     """
-    filename = 'nh_data_' + datetime.today().strftime('%Y%m%d')
+    filename = 'user_data_' + datetime.today().strftime('%Y%m%d')
     filepath = os.path.join(tempdir, filename)
 
     with open(filepath, 'w') as f:
-        f.write(nh_data)
-    metadata = {
-        'tags': ['nokiahealth', 'health', 'measure'],
-        'description': 'File with Nokia Health data',
-    }
+        f.write(user_data)
+
     return filepath, metadata
 
 
