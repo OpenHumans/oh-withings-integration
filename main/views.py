@@ -6,7 +6,8 @@ from requests_respectful import RespectfulRequester
 from django.contrib.auth import login
 from django.shortcuts import render, redirect
 from django.conf import settings
-from datauploader.tasks import xfer_to_open_humans
+from datauploader.tasks import (xfer_to_open_humans,
+                                make_request_respectful_get)
 from requests_oauthlib import OAuth1
 from urllib.parse import parse_qs
 from open_humans.models import OpenHumansMember
@@ -117,15 +118,16 @@ def complete_nokia(request):
                         resource_owner_secret=oauth_token_secret,
                         signature_type='query')
 
-    r_activity = rr.get(url=activity_url, auth=queryoauth, realms=["Nokia"])
-    r_meas = rr.get(url=meas_url, auth=queryoauth, realms=["Nokia"])
-    r_intraday = rr.get(url=intraday_url, auth=queryoauth, realms=["Nokia"])
-    r_sleep = rr.get(url=sleep_url, auth=queryoauth, realms=["Nokia"])
-    r_sleep_summary = rr.get(url=sleep_summary_url, auth=queryoauth, realms=["Nokia"])
-    r_workouts = rr.get(url=workouts_url, auth=queryoauth, realms=["Nokia"])
+    urllist = [activity_url, meas_url, intraday_url, sleep_url,
+               sleep_summary_url, workouts_url]
+    dataarray = []
+    for url in urllist:
+        data = make_request_respectful_get.delay(url=url,
+                                                 realms=["Nokia"],
+                                                 auth=queryoauth)
 
-    dataarray = [r_activity.text, r_meas.text, r_intraday.text, r_sleep.text,
-                 r_sleep_summary.text, r_workouts.text]
+        dataarray.append(data)
+
     datastring = combine_nh_data(dataarray)
     print(datastring)
 

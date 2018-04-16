@@ -131,3 +131,10 @@ def upload_file_to_oh(oh_member, filepath, metadata):
 
     logger.debug('Upload done: "{}" for member {}.'.format(
             os.path.basename(filepath), oh_member.oh_id))
+
+
+@shared_task
+def make_request_respectful_get(url, realms, **kwargs):
+    r = settings.rr.get(url=url, realms=realms, **kwargs)
+    logger.debug('Request completed. Response: {}'.format(r.text))
+    return r.text
