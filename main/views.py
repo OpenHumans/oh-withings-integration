@@ -114,19 +114,12 @@ def complete_nokia(request):
 
 
 def fetch_nokia_data(nokia_member):
-    activity_url = 'https://api.health.nokia.com' +\
-                   '/v2/measure?action=getactivity'
-    meas_url = 'https://api.health.nokia.com' +\
-               '/measure?action=getmeas&userid=' + str(nokia_member.userid)
-    intraday_url = 'https://api.health.nokia.com' +\
-                   '/v2/measure?action=getintradayactivity'
-    sleep_url = 'https://api.health.nokia.com/v2/sleep?' +\
-                'action=get&startdate=1387234800&enddate=1387258800' +\
-                str(nokia_member.userid)
-    sleep_summary_url = 'https://api.health.nokia.com' +\
-                        '/v2/sleep?action=getsummary'
-    workouts_url = 'https://api.health.nokia.com' +\
-                   '/v2/measure?action=getworkouts'
+    activity_url = 'https://api.health.nokia.com/v2/measure?action=getactivity'
+    meas_url = 'https://api.health.nokia.com/measure?action=getmeas&userid=' + str(nokia_member.userid)
+    intraday_url = 'https://api.health.nokia.com/v2/measure?action=getintradayactivity'
+    sleep_url = 'https://api.health.nokia.com/v2/sleep?action=get&startdate=1387234800&enddate=1387258800' + str(nokia_member.userid)
+    sleep_summary_url = 'https://api.health.nokia.com/v2/sleep?action=getsummary'
+    workouts_url = 'https://api.health.nokia.com/v2/measure?action=getworkouts'
 
     queryoauth = OAuth1(client_key,
                         client_secret=client_secret,
