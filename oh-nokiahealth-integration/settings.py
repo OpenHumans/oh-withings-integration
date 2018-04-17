@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 import os
 import dj_database_url
 import logging
+from requests_respectful import RespectfulRequester
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -58,6 +60,11 @@ if REMOTE is False:
 else:
     NOKIA_CALLBACK_URL =\
         'http://oh-nokiahealth-integration.herokuapp.com/complete_nokia'
+
+
+# This creates a Realm called "source" that allows 60 requests per minute max.
+rr = RespectfulRequester()
+rr.register_realm("Nokia", max_requests=60, timespan=60)
 
 # Application definition
 
