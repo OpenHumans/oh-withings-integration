@@ -86,7 +86,7 @@ MIDDLEWARE = [
     'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
-ROOT_URLCONF = 'oh-nokiahealth-integration.urls'
+ROOT_URLCONF = 'nokia.urls'
 
 TEMPLATES = [
     {
@@ -104,7 +104,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'oh-nokiahealth-integration.wsgi.application'
+WSGI_APPLICATION = 'nokia.wsgi.application'
 
 
 # Database
