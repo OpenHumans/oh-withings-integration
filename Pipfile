@@ -19,7 +19,6 @@ raven = "*"
 vcrpy = "*"
 pyyaml = "*"
 redis = "*"
-requests-respectful = { git = 'git@github.com:mcescalante/requests-respectful.git', editable = 'true' }
 
 [dev-packages]
 pylint = "*"

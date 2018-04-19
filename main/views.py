@@ -11,6 +11,7 @@ from requests_oauthlib import OAuth1
 from urllib.parse import parse_qs
 from open_humans.models import OpenHumansMember
 from .models import NokiaHealthMember
+from urllib.parse import urlparse
 
 # Set up logging.
 logger = logging.getLogger(__name__)
@@ -28,11 +29,10 @@ authorization_url = 'https://developer.health.nokia.com/account/authorize'
 access_token_url = 'https://developer.health.nokia.com/account/access_token'
 
 # if settings.REMOTE is True:
-from urllib.parse import urlparse
 url_object = urlparse(os.getenv('REDIS_URL'))
 print('Connecting to redis at',
-    url_object.hostname,
-    url_object.port)
+      url_object.hostname,
+      url_object.port)
 RespectfulRequester.configure(
     redis={
         "host": url_object.hostname,
@@ -121,7 +121,8 @@ def complete_nokia(request):
     r_meas = rr.get(url=meas_url, auth=queryoauth, realms=["Nokia"])
     r_intraday = rr.get(url=intraday_url, auth=queryoauth, realms=["Nokia"])
     r_sleep = rr.get(url=sleep_url, auth=queryoauth, realms=["Nokia"])
-    r_sleep_summary = rr.get(url=sleep_summary_url, auth=queryoauth, realms=["Nokia"])
+    r_sleep_summary = rr.get(url=sleep_summary_url,
+                             auth=queryoauth, realms=["Nokia"])
     r_workouts = rr.get(url=workouts_url, auth=queryoauth, realms=["Nokia"])
 
     dataarray = [r_activity.text, r_meas.text, r_intraday.text, r_sleep.text,
