@@ -13,6 +13,10 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 import os
 import dj_database_url
 import logging
+from requests_respectful import RespectfulRequester
+
+logger = logging.getLogger(__name__)
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -52,6 +56,25 @@ OH_DELETE_FILES = OH_API_BASE + '/project/files/delete/'
 NOKIA_USER_PAGE = os.getenv('NOKIA_USER_PAGE')
 NOKIA_CONSUMER_KEY = os.getenv('NOKIA_CONSUMER_KEY')
 NOKIA_CONSUMER_SECRET = os.getenv('NOKIA_CONSUMER_SECRET')
+
+if REMOTE is True:
+    from urllib.parse import urlparse
+    url_object = urlparse(os.getenv('REDIS_URL'))
+    logger.info('Connecting to redis at %s:%s',
+                url_object.hostname,
+                url_object.port)
+    RespectfulRequester.configure(
+        redis={
+            "host": url_object.hostname,
+            "port": url_object.port,
+            "password": url_object.password,
+            "database": 0
+        },
+        safety_threshold=5)
+
+# Requests Respectful (rate limiting, waiting)
+rr = RespectfulRequester()
+rr.register_realm("Nokia", max_requests=3600, timespan=3600)
 
 if REMOTE is False:
     NOKIA_CALLBACK_URL = 'http://127.0.0.1:5000/complete_nokia'
@@ -126,20 +149,20 @@ if REMOTE:
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.\
-                 UserAttributeSimilarityValidator',
+        'NAME': ('django.contrib.auth.password_validation.'
+                 'UserAttributeSimilarityValidator'),
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.\
-                 MinimumLengthValidator',
+        'NAME': ('django.contrib.auth.password_validation.'
+                 'MinimumLengthValidator'),
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.\
-                 CommonPasswordValidator',
+        'NAME': ('django.contrib.auth.password_validation.'
+                 'CommonPasswordValidator'),
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.\
-                 NumericPasswordValidator',
+        'NAME': ('django.contrib.auth.password_validation.'
+                 'NumericPasswordValidator'),
     },
 ]
 

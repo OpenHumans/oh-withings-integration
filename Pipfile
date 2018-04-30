@@ -4,21 +4,22 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-amqp = "*"
 arrow = "*"
 celery = "*"
 dj-database-url = "*"
 django = "*"
 gunicorn = "*"
+iptools = "*"
+open-humans-api = "*"
 "psycopg2" = "*"
+python-social-auth = "*"
+pyyaml = "*"
+raven = "*"
+redis = "*"
 requests = "*"
 requests-oauthlib = "*"
-whitenoise = "*"
-python-social-auth = "*"
-raven = "*"
 vcrpy = "*"
-pyyaml = "*"
-redis = "*"
+whitenoise = "*"
 
 [dev-packages]
 pylint = "*"
