@@ -1,8 +1,6 @@
 import logging
 import requests
-import os
 
-from requests_respectful import RespectfulRequester
 from django.contrib.auth import login
 from django.shortcuts import render, redirect
 from django.conf import settings
@@ -13,7 +11,6 @@ from requests_oauthlib import OAuth1
 from urllib.parse import parse_qs
 from open_humans.models import OpenHumansMember
 from .models import NokiaHealthMember
-from urllib.parse import urlparse
 
 # Set up logging.
 logger = logging.getLogger(__name__)
@@ -29,24 +26,6 @@ oh_proj_page = settings.OH_ACTIVITY_PAGE
 request_token_url = 'https://developer.health.nokia.com/account/request_token'
 authorization_url = 'https://developer.health.nokia.com/account/authorize'
 access_token_url = 'https://developer.health.nokia.com/account/access_token'
-
-# if settings.REMOTE is True:
-url_object = urlparse(os.getenv('REDIS_URL'))
-print('Connecting to redis at',
-      url_object.hostname,
-      url_object.port)
-RespectfulRequester.configure(
-    redis={
-        "host": url_object.hostname,
-        "port": url_object.port,
-        "password": url_object.password,
-        "database": 0
-    },
-    safety_threshold=5)
-
-# Requests Respectful (rate limiting, waiting)
-rr = RespectfulRequester()
-rr.register_realm("Nokia", max_requests=60, timespan=60)
 
 
 def index(request):
