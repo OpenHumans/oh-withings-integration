@@ -10,12 +10,15 @@ import json
 import shutil
 import tempfile
 import requests
+import arrow
+
 from celery import shared_task
 from django.conf import settings
 from requests_oauthlib import OAuth1
 from open_humans.models import OpenHumansMember
-from datetime import datetime
+from datetime import datetime, timedelta
 from nokia.settings import rr
+from requests_respectful import RequestsRespectfulRateLimitedError
 from ohapi import api
 
 
