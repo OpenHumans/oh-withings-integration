@@ -116,11 +116,12 @@ def update_nokia(oh_member, userid, queryoauth, nokia_data):
                 nokia_data[key] = dataarray[i]
 
     except RequestsRespectfulRateLimitedError:
+        print('Hit limit requeue request')
         logger.debug(
             'Requeued processing for {} with 60s delay'.format(
                 oh_member.oh_id)
         )
-        process_nokia.apply_async(args=[oh_member.oh_id], countdown=61)
+        # process_nokia.apply_async(args=[oh_member.oh_id], countdown=61)
     finally:
         replace_nokia(oh_member, nokia_data)
 
