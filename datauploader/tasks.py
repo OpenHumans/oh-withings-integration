@@ -11,6 +11,7 @@ import shutil
 import tempfile
 import requests
 import arrow
+import time
 
 from celery import shared_task
 from django.conf import settings
@@ -52,6 +53,44 @@ def process_nokia(oh_id):
 
 def update_nokia(oh_member, userid, queryoauth, nokia_data):
     try:
+        # Set start date and end date (unix) for data fetch
+        start_time = get_start_date(nokia_data)
+        stop_time = int(time.time())
+        while start_time != stop_time:
+            nokia_urls = [
+                {'name': 'activity',
+                 'url': 'https://api.health.nokia.com/v2/' +
+                        'measure?action=getactivity',
+                 'period': ''},
+                {'name': 'measure',
+                 'url': 'https://api.health.nokia.com' +
+                        '/measure?action=getmeas&userid=' + str(userid),
+                 'period': ''},
+                {'name': 'intraday',
+                 'url': 'https://api.health.nokia.com' +
+                        '/v2/measure?action=getintradayactivity',
+                 'period': ''},
+                {'name': 'sleep',
+                 'url': 'https://api.health.nokia.com/v2/sleep?' +
+                        'action=get&startdate=' + str(start_time) +
+                        '&enddate=' + str(stop_time) + str(userid),
+                 'period': ''},
+                {'name': 'sleep_summary',
+                 'url': 'https://api.health.nokia.com' +
+                        '/v2/sleep?action=getsummary',
+                 'period': ''},
+                {'name': 'workouts',
+                 'url': 'https://api.health.nokia.com' +
+                        '/v2/measure?action=getworkouts',
+                 'period': ''}
+            ]
+            dataarray = []
+            for url in nokia_urls:
+                thisfetch = rr.get(url=url['url'], auth=queryoauth,
+                                   realms=["Nokia"])
+                dataarray.append(thisfetch.text)
+            datastring = combine_nh_data(dataarray)
+            nokia_data += datastring
 
     except RequestsRespectfulRateLimitedError:
 
