@@ -31,6 +31,13 @@ def process_nokia(oh_id):
     '''
     Fetch all nokia health data for a given user
     '''
+    oh_member = OpenHumansMember.objects.get(oh_id=oh_id)
+    oh_access_token = oh_member.get_access_token(
+                            client_id=settings.OPENHUMANS_CLIENT_ID,
+                            client_secret=settings.OPENHUMANS_CLIENT_SECRET)
+
+    nokia_data = get_existing_nokia(oh_access_token)
+    nokia_member = oh_member.nokiahealthmember
     userid = nokia_member['userid']
     oauth_token = nokia_member['oauth_token']
     oauth_token_secret = nokia_member['oauth_token_secret']
