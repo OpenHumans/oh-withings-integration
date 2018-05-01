@@ -56,15 +56,6 @@ def complete_nokia(request):
     logger.debug('Could not create Nokia member.')
     return None
 
-    # 5. Upload data to Open Humans.
-
-    # metadata = {
-    #     'tags': ['nokiahealth', 'health', 'measure'],
-    #     'description': 'File with Nokia Health data',
-    # }
-
-    # xfer_to_open_humans.delay(datastring, metadata, oh_id=oh_id)
-
 
 def nokia_make_member(verifier, resource_owner_key,
                       resource_owner_secret, oh_user):
