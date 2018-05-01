@@ -23,7 +23,8 @@ logger = logging.getLogger(__name__)
 
 
 @shared_task
-def fetch_nokia_data(userid, queryoauth, nokia_data):
+def fetch_nokia_data(userid, client_key, client_secret, oauth_token,
+                     oauth_token_secret, nokia_data):
     '''
     Fetch all nokia health data for a given user
     '''
@@ -53,6 +54,12 @@ def fetch_nokia_data(userid, queryoauth, nokia_data):
                 '/v2/measure?action=getworkouts',
          'period': ''}
     ]
+
+    queryoauth = OAuth1(client_key,
+                        client_secret=client_secret,
+                        resource_owner_key=oauth_token,
+                        resource_owner_secret=oauth_token_secret,
+                        signature_type='query')
 
     dataarray = []
     for url in nokia_urls:
@@ -90,6 +97,7 @@ def get_existing_nokia(oh_access_token):
             tf_in.flush()
             nokia_data = json.load(open(tf_in.name))
             return nokia_data
+    print("NOKIA DATA:")
     return []
 
 

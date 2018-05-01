@@ -83,23 +83,18 @@ def complete_nokia(request):
     nokia_data = get_existing_nokia(oh_user.access_token)
     # print(fitbit_data)
 
-    queryoauth = OAuth1(client_key,
-                        client_secret=client_secret,
-                        resource_owner_key=oauth_token,
-                        resource_owner_secret=oauth_token_secret,
-                        signature_type='query')
-
     # Fetch user's data from Nokia (update the data if it already existed)
-    datastring = fetch_nokia_data.delay(userid, queryoauth, nokia_data)
+    fetch_nokia_data.delay(userid, client_key, client_secret, oauth_token,
+                           oauth_token_secret, nokia_data)
 
     # 5. Upload data to Open Humans.
 
-    metadata = {
-        'tags': ['nokiahealth', 'health', 'measure'],
-        'description': 'File with Nokia Health data',
-    }
+    # metadata = {
+    #     'tags': ['nokiahealth', 'health', 'measure'],
+    #     'description': 'File with Nokia Health data',
+    # }
 
-    xfer_to_open_humans.delay(datastring, metadata, oh_id=oh_id)
+    # xfer_to_open_humans.delay(datastring, metadata, oh_id=oh_id)
 
     context = {'tokeninfo': 'Fetching data...',
                'oh_proj_page': oh_proj_page}
