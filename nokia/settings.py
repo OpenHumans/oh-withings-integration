@@ -76,11 +76,12 @@ if REMOTE is True:
 rr = RespectfulRequester()
 rr.register_realm("Nokia", max_requests=3600, timespan=3600)
 
-if REMOTE is False:
-    NOKIA_CALLBACK_URL = 'http://127.0.0.1:5000/complete_nokia'
+if REMOTE:
+    print("remote print")
+    NOKIA_CALLBACK_URL = 'http://oh-nokiahealth-integration.herokuapp.com/complete_nokia'
 else:
-    NOKIA_CALLBACK_URL =\
-        'http://oh-nokiahealth-integration.herokuapp.com/complete_nokia'
+    print("local print")
+    NOKIA_CALLBACK_URL = 'http://127.0.0.1:5000/complete_nokia'
 
 # Application definition
 
