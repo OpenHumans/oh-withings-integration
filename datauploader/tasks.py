@@ -102,9 +102,29 @@ def update_nokia(oh_member, userid, queryoauth, nokia_data):
         replace_nokia(oh_member, nokia_data)
 
 
-    datastring = combine_nh_data(dataarray)
-    print(datastring)
-    return datastring
+def replace_nokia(oh_member, nokia_data):
+    """
+    Delete any old file and upload new
+    """
+    tmp_directory = tempfile.mkdtemp()
+    metadata = {
+        'tags': ['nokiahealth', 'health', 'measure'],
+        'description': 'File with Nokia Health data',
+        'updated_at': str(datetime.utcnow()),
+    }
+    filename = 'user_data_' + datetime.today().strftime('%Y%m%d')
+    out_file = os.path.join(tmp_directory, filename)
+    logger.debug('deleted old file for {}'.format(oh_member.oh_id))
+    api.delete_file(oh_member.access_token,
+                    oh_member.oh_id,
+                    file_basename=filename)
+    with open(out_file, 'w') as json_file:
+        json.dump(nokia_data, json_file)
+        json_file.flush()
+    api.upload_aws(out_file, metadata,
+                   oh_member.access_token,
+                   project_member_id=oh_member.oh_id)
+    logger.debug('uploaded new file for {}'.format(oh_member.oh_id))
 
 
 def combine_nh_data(dataarray):
