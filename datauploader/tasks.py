@@ -93,40 +93,14 @@ def update_nokia(oh_member, userid, queryoauth, nokia_data):
             nokia_data += datastring
 
     except RequestsRespectfulRateLimitedError:
-
+        logger.debug(
+            'Requeued processing for {} with 60s delay'.format(
+                oh_member.oh_id)
+        )
+        process_nokia.apply_async(args=[oh_member.oh_id], countdown=61)
     finally:
         replace_nokia(oh_member, nokia_data)
-    nokia_urls = [
-        {'name': 'activity',
-         'url': 'https://api.health.nokia.com/v2/measure?action=getactivity',
-         'period': ''},
-        {'name': 'measure',
-         'url': 'https://api.health.nokia.com' +
-                '/measure?action=getmeas&userid=' + str(userid),
-         'period': ''},
-        {'name': 'intraday',
-         'url': 'https://api.health.nokia.com' +
-                '/v2/measure?action=getintradayactivity',
-         'period': ''},
-        {'name': 'sleep',
-         'url': 'https://api.health.nokia.com/v2/sleep?' +
-                'action=get&startdate=1387234800&enddate=1387258800' +
-                str(userid),
-         'period': ''},
-        {'name': 'sleep_summary',
-         'url': 'https://api.health.nokia.com' +
-                '/v2/sleep?action=getsummary',
-         'period': ''},
-        {'name': 'workouts',
-         'url': 'https://api.health.nokia.com' +
-                '/v2/measure?action=getworkouts',
-         'period': ''}
-    ]
 
-    dataarray = []
-    for url in nokia_urls:
-        thisfetch = rr.get(url=url['url'], auth=queryoauth, realms=["Nokia"])
-        dataarray.append(thisfetch.text)
 
     datastring = combine_nh_data(dataarray)
     print(datastring)
