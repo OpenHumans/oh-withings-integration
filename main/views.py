@@ -65,9 +65,45 @@ def complete_nokia(request):
 
     # xfer_to_open_humans.delay(datastring, metadata, oh_id=oh_id)
 
-    context = {'tokeninfo': 'Fetching data...',
-               'oh_proj_page': oh_proj_page}
-    return render(request, 'main/complete_nokia.html', context=context)
+
+def nokia_make_member(verifier, resource_owner_key,
+                      resource_owner_secret, oh_user):
+
+    if settings.NOKIA_CONSUMER_KEY and settings.NOKIA_CONSUMER_SECRET and \
+       verifier and resource_owner_key and resource_owner_secret:
+        # Create a new OAuth1 object using the resource owner key/secret
+        # from session data and using the verifier parsed from the URL (above)
+        oauth = OAuth1(settings.NOKIA_CONSUMER_KEY,
+                       client_secret=settings.NOKIA_CONSUMER_SECRET,
+                       resource_owner_key=resource_owner_key,
+                       resource_owner_secret=resource_owner_secret,
+                       verifier=verifier)
+
+        access_token_url =\
+            'https://developer.health.nokia.com/account/access_token'
+        # Make a request to Nokia (final request) for an access token
+        r = requests.post(url=access_token_url, auth=oauth)
+        credentials = parse_qs(r.text)
+
+        # Make member model
+        oauth_token = credentials.get('oauth_token')[0]
+        oauth_token_secret = credentials.get('oauth_token_secret')[0]
+        userid = credentials.get('userid')[0]
+        deviceid = credentials.get('deviceid')[0]
+
+        nokia_member = NokiaHealthMember.objects.get_or_create(
+            user=oh_user,
+            userid=userid,
+            deviceid=deviceid,
+            oauth_token=oauth_token,
+            oauth_token_secret=oauth_token_secret)
+
+        return nokia_member
+
+    else:
+        logger.error('Nokia credentials are unavailable')
+
+    return None
 
 
 def complete(request):
