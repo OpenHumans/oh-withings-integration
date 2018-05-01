@@ -43,21 +43,18 @@ def complete_nokia(request):
     oh_id = request.user.oh_member.oh_id
     oh_user = OpenHumansMember.objects.get(oh_id=oh_id)
 
-    NokiaHealthMember.objects.get_or_create(
-        user=oh_user,
-        userid=userid,
-        deviceid=deviceid,
-        oauth_token=oauth_token,
-        oauth_token_secret=oauth_token_secret)
+    nokia_member = nokia_make_member(verifier, resource_owner_key,
+                                     resource_owner_secret, oh_user)
 
-    # Fetch user's existing data from OH
-    # We are going to use the pip package open-humans-api for this
-    nokia_data = get_existing_nokia(oh_user.access_token)
-    # print(fitbit_data)
+    if nokia_member:
+        # Fetch user's data from Nokia (update the data if it already existed)
+        process_nokia.delay(nokia_member)
+        context = {'tokeninfo': 'Fetching data...',
+                   'oh_proj_page': settings.OH_ACTIVITY_PAGE}
+        return render(request, 'main/complete_nokia.html', context=context)
 
-    # Fetch user's data from Nokia (update the data if it already existed)
-    fetch_nokia_data.delay(userid, client_key, client_secret, oauth_token,
-                           oauth_token_secret, nokia_data)
+    logger.debug('Could not create Nokia member.')
+    return None
 
     # 5. Upload data to Open Humans.
 
