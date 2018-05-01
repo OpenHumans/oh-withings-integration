@@ -41,10 +41,22 @@ def process_nokia(oh_id):
     userid = nokia_member['userid']
     oauth_token = nokia_member['oauth_token']
     oauth_token_secret = nokia_member['oauth_token_secret']
-    # # Fetch user's existing data from OH
-    # # We are going to use the pip package open-humans-api for this
-    # nokia_data = get_existing_nokia(oh_user.access_token)
+    queryoauth = OAuth1(client_key=settings.NOKIA_CONSUMER_KEY,
+                        client_secret=settings.NOKIA_CONSUMER_SECRET,
+                        resource_owner_key=oauth_token,
+                        resource_owner_secret=oauth_token_secret,
+                        signature_type='query')
 
+    update_nokia(oh_member, userid, queryoauth, nokia_data)
+
+
+def update_nokia(oh_member, userid, queryoauth, nokia_data):
+    try:
+
+    except RequestsRespectfulRateLimitedError:
+
+    finally:
+        replace_nokia(oh_member, nokia_data)
     nokia_urls = [
         {'name': 'activity',
          'url': 'https://api.health.nokia.com/v2/measure?action=getactivity',
@@ -71,12 +83,6 @@ def process_nokia(oh_id):
                 '/v2/measure?action=getworkouts',
          'period': ''}
     ]
-
-    queryoauth = OAuth1(client_key=settings.NOKIA_CONSUMER_KEY,
-                        client_secret=settings.NOKIA_CONSUMER_SECRET,
-                        resource_owner_key=oauth_token,
-                        resource_owner_secret=oauth_token_secret,
-                        signature_type='query')
 
     dataarray = []
     for url in nokia_urls:
@@ -114,7 +120,7 @@ def get_existing_nokia(oh_access_token):
             tf_in.flush()
             nokia_data = json.load(open(tf_in.name))
             return nokia_data
-    print("NOKIA DATA:")
+    print("NOKIA DATA")
     return []
 
 
