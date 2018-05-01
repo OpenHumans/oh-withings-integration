@@ -12,6 +12,7 @@ import tempfile
 import requests
 from celery import shared_task
 from django.conf import settings
+from requests_oauthlib import OAuth1
 from open_humans.models import OpenHumansMember
 from datetime import datetime
 from nokia.settings import rr
