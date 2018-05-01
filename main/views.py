@@ -41,6 +41,7 @@ def complete_nokia(request):
     resource_owner_secret = request.session['resource_owner_secret']
 
     oh_id = request.user.oh_member.oh_id
+    print(oh_id)
     oh_user = OpenHumansMember.objects.get(oh_id=oh_id)
 
     nokia_member = nokia_make_member(verifier, resource_owner_key,
