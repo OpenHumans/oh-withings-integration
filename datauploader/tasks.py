@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 
 
 @shared_task
-def process_nokia(nokia_member):
+def process_nokia(oh_id):
     '''
     Fetch all nokia health data for a given user
     '''
