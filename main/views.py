@@ -13,17 +13,9 @@ from .models import NokiaHealthMember
 # Set up logging.
 logger = logging.getLogger(__name__)
 
-# OAuth1 for Nokia Health
-# Credentials obtained during the registration.
-client_key = settings.NOKIA_CONSUMER_KEY
-client_secret = settings.NOKIA_CONSUMER_SECRET
-callback_uri = settings.NOKIA_CALLBACK_URL
-oh_proj_page = settings.OH_ACTIVITY_PAGE
-
 # Endpoints found in the OAuth provider API documentation
 request_token_url = 'https://developer.health.nokia.com/account/request_token'
 authorization_url = 'https://developer.health.nokia.com/account/authorize'
-access_token_url = 'https://developer.health.nokia.com/account/access_token'
 
 
 def index(request):
