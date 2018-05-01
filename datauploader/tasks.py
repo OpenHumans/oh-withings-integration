@@ -10,11 +10,17 @@ import json
 import shutil
 import tempfile
 import requests
+import arrow
+import time
+import dateutil.parser as dp
+
 from celery import shared_task
 from django.conf import settings
+from requests_oauthlib import OAuth1
 from open_humans.models import OpenHumansMember
-from datetime import datetime
+from datetime import datetime, timedelta
 from nokia.settings import rr
+from requests_respectful import RequestsRespectfulRateLimitedError
 from ohapi import api
 
 
@@ -23,61 +29,125 @@ logger = logging.getLogger(__name__)
 
 
 @shared_task
-def fetch_nokia_data(userid, queryoauth, nokia_data):
+def process_nokia(oh_id):
     '''
     Fetch all nokia health data for a given user
     '''
-    nokia_urls = [
-        {'name': 'activity',
-         'url': 'https://api.health.nokia.com/v2/measure?action=getactivity',
-         'period': ''},
-        {'name': 'measure',
-         'url': 'https://api.health.nokia.com' +
-                '/measure?action=getmeas&userid=' + str(userid),
-         'period': ''},
-        {'name': 'intraday',
-         'url': 'https://api.health.nokia.com' +
-                '/v2/measure?action=getintradayactivity',
-         'period': ''},
-        {'name': 'sleep',
-         'url': 'https://api.health.nokia.com/v2/sleep?' +
-                'action=get&startdate=1387234800&enddate=1387258800' +
-                str(userid),
-         'period': ''},
-        {'name': 'sleep_summary',
-         'url': 'https://api.health.nokia.com' +
-                '/v2/sleep?action=getsummary',
-         'period': ''},
-        {'name': 'workouts',
-         'url': 'https://api.health.nokia.com' +
-                '/v2/measure?action=getworkouts',
-         'period': ''}
-    ]
+    print('Entering process_nokia function')
+    oh_member = OpenHumansMember.objects.get(oh_id=oh_id)
+    oh_access_token = oh_member.get_access_token(
+                            client_id=settings.OPENHUMANS_CLIENT_ID,
+                            client_secret=settings.OPENHUMANS_CLIENT_SECRET)
 
-    dataarray = []
-    for url in nokia_urls:
-        thisfetch = rr.get(url=url['url'], auth=queryoauth, realms=["Nokia"])
-        dataarray.append(thisfetch.text)
+    nokia_data = get_existing_nokia(oh_access_token)
+    nokia_member = oh_member.nokiahealthmember
+    userid = nokia_member.userid
+    oauth_token = nokia_member.oauth_token
+    oauth_token_secret = nokia_member.oauth_token_secret
+    print(userid)
+    queryoauth = OAuth1(client_key=settings.NOKIA_CONSUMER_KEY,
+                        client_secret=settings.NOKIA_CONSUMER_SECRET,
+                        resource_owner_key=oauth_token,
+                        resource_owner_secret=oauth_token_secret,
+                        signature_type='query')
 
-    datastring = combine_nh_data(dataarray)
-    print(datastring)
-    return datastring
+    print('Calling update_nokia function')
+    update_nokia(oh_member, userid, queryoauth, nokia_data)
 
 
-def combine_nh_data(dataarray):
+def update_nokia(oh_member, userid, queryoauth, nokia_data):
+    oh_access_token = oh_member.get_access_token(
+                            client_id=settings.OPENHUMANS_CLIENT_ID,
+                            client_secret=settings.OPENHUMANS_CLIENT_SECRET)
+    try:
+        # Set start date and end date (unix) for data fetch
+        start_time = get_start_time(oh_access_token, nokia_data)
+        start_ymd = start_time.strftime('%Y-%m-%d')
+        start_epoch = start_time.strftime('%s')
+
+        stop_time = datetime.utcnow() + timedelta(days=7)
+        stop_ymd = stop_time.strftime('%Y-%m-%d')
+        stop_epoch = stop_time.strftime('%s')
+
+        while start_ymd != stop_ymd:
+            nokia_urls = [
+                {'name': 'activity',
+                 'url': 'https://api.health.nokia.com/v2/' +
+                        'measure?action=getactivity&userid=' + str(userid) +
+                        '&startdateymd=' + str(start_ymd) + '&enddateymd=' +
+                        str(stop_ymd)},
+                {'name': 'measure',
+                 'url': 'https://api.health.nokia.com' +
+                        '/measure?action=getmeas&userid=' + str(userid) +
+                        '&startdate=' + str(start_epoch) + '&enddate=' +
+                        str(stop_epoch)},
+                {'name': 'intraday',
+                 'url': 'https://api.health.nokia.com' +
+                        '/v2/measure?action=getintradayactivity' +
+                        str(userid) + '&startdate=' + str(start_epoch) +
+                        '&enddate=' + str(stop_epoch)},
+                {'name': 'sleep',
+                 'url': 'https://api.health.nokia.com/v2/sleep?' +
+                        'action=get&startdate=' + str(start_epoch) +
+                        '&enddate=' + str(stop_epoch) + '&userid=' +
+                        str(userid)},
+                {'name': 'sleep_summary',
+                 'url': 'https://api.health.nokia.com' +
+                        '/v2/sleep?action=getsummary&startdateymd=' +
+                        str(start_ymd) + '&enddateymd=' + str(stop_ymd)},
+                {'name': 'workouts',
+                 'url': 'https://api.health.nokia.com' +
+                        '/v2/measure?action=getworkouts&userid=' +
+                        str(userid) + '&startdateymd=' + str(start_ymd) +
+                        '&enddateymd=' + str(stop_ymd)}
+            ]
+            dataarray = []
+            for url in nokia_urls:
+                print(url['url'])
+                thisfetch = rr.get(url=url['url'], auth=queryoauth,
+                                   realms=["Nokia"])
+                dataarray.append(thisfetch.text)
+
+            endpoints = ['"activity":', ',"measure":', ',"intraday":',
+                         ',"sleep":', ',"sleepsummary":', ',"workouts":']
+
+            for i in range(0, len(endpoints)-1):
+                key = endpoints[i]
+                nokia_data[key] = dataarray[i]
+
+    except RequestsRespectfulRateLimitedError:
+        logger.debug(
+            'Requeued processing for {} with 60s delay'.format(
+                oh_member.oh_id)
+        )
+        process_nokia.apply_async(args=[oh_member.oh_id], countdown=61)
+    finally:
+        replace_nokia(oh_member, nokia_data)
+
+
+def replace_nokia(oh_member, nokia_data):
     """
-    Combine Nokia Health data for all endpoints (activity, measure, intraday,
-    sleep, sleep summary, workouts) into a single string.
+    Delete any old file and upload new
     """
-    endpoints = ['"activity":', ',"measure":', ',"intraday":',
-                 ',"sleep":', ',"sleepsummary":', ',"workouts":']
-
-    datastring = '{'
-    for i in range(0, len(endpoints)-1):
-        datastring += endpoints[i] + dataarray[i]
-
-    datastring += '}'
-    return datastring
+    tmp_directory = tempfile.mkdtemp()
+    metadata = {
+        'tags': ['nokiahealth', 'health', 'measure'],
+        'description': 'File with Nokia Health data',
+        'updated_at': str(datetime.utcnow()),
+    }
+    filename = 'nokia_data_' + datetime.today().strftime('%Y%m%d')
+    out_file = os.path.join(tmp_directory, filename)
+    logger.debug('deleted old file for {}'.format(oh_member.oh_id))
+    api.delete_file(oh_member.access_token,
+                    oh_member.oh_id,
+                    file_basename=filename)
+    with open(out_file, 'w') as json_file:
+        json.dump(nokia_data, json_file)
+        json_file.flush()
+    api.upload_aws(out_file, metadata,
+                   oh_member.access_token,
+                   project_member_id=oh_member.oh_id)
+    logger.debug('uploaded new file for {}'.format(oh_member.oh_id))
 
 
 def get_existing_nokia(oh_access_token):
@@ -90,118 +160,28 @@ def get_existing_nokia(oh_access_token):
             tf_in.flush()
             nokia_data = json.load(open(tf_in.name))
             return nokia_data
+    print("NOKIA DATA")
     return []
 
 
-@shared_task
-def xfer_to_open_humans(user_data, metadata, oh_id, num_submit=0, **kwargs):
+def get_start_time(oh_access_token, nokia_data):
     """
-    Transfer data to Open Humans.
-    num_submit is an optional parameter in case you want to resubmit failed
-    tasks (see comments in code).
+    Look at existing nokia data and find out the last date it fetches
     """
-
-    logger.debug('Trying to copy data for {} to Open Humans'.format(oh_id))
-
-    oh_member = OpenHumansMember.objects.get(oh_id=oh_id)
-
-    # Make a tempdir for all temporary files.
-    # Delete this even if an exception occurs.
-    tempdir = tempfile.mkdtemp()
-    try:
-        add_data_to_open_humans(user_data, metadata, oh_member, tempdir)
-    finally:
-        shutil.rmtree(tempdir)
-
-    # Note: Want to re-run tasks in case of a failure?
-    # You can resubmit a task by calling it again. (Be careful with recursion!)
-    # e.g. to give up, resubmit, & try again after 10s if less than 5 attempts:
-    # if num_submit < 5:
-    #     num_submit += 1
-    #     xfer_to_open_humans.apply_async(
-    #         args=[oh_id, num_submit], kwargs=kwargs, countdown=10)
-    #     return
-
-
-def add_data_to_open_humans(user_data, metadata, oh_member, tempdir):
-    """
-    Add demonstration file to Open Humans.
-    This might be a good place to start editing, to add your own project data.
-    This template is written to provide the function with a tempdir that
-    will be cleaned up later. You can use the tempdir to stage the creation of
-    files you plan to upload to Open Humans.
-    """
-    # Create data file.
-    data_filepath, data_metadata = make_datafile(user_data, metadata, tempdir)
-
-    # Remove any files with this name previously added to Open Humans.
-    delete_oh_file_by_name(oh_member, filename=os.path.basename(data_filepath))
-
-    # Upload this file to Open Humans.
-    upload_file_to_oh(oh_member, data_filepath, data_metadata)
-
-
-def make_datafile(user_data, metadata, tempdir):
-    """
-    Make a user data file in the tempdir.
-    """
-    filename = 'user_data_' + datetime.today().strftime('%Y%m%d')
-    filepath = os.path.join(tempdir, filename)
-
-    with open(filepath, 'w') as f:
-        f.write(user_data)
-
-    return filepath, metadata
-
-
-def delete_oh_file_by_name(oh_member, filename):
-    """
-    Delete all project files matching the filename for this Open Humans member.
-    This deletes files this project previously added to the Open Humans
-    member account, if they match this filename. Read more about file deletion
-    API options here:
-    https://www.openhumans.org/direct-sharing/oauth2-data-upload/#deleting-files
-    """
-    req = requests.post(
-        settings.OH_DELETE_FILES,
-        params={'access_token': oh_member.get_access_token()},
-        data={'project_member_id': oh_member.oh_id,
-              'file_basename': filename})
-    req.raise_for_status()
-
-
-def upload_file_to_oh(oh_member, filepath, metadata):
-    """
-    This demonstrates using the Open Humans "large file" upload process.
-    The small file upload process is simpler, but it can time out. This
-    alternate approach is required for large files, and still appropriate
-    for small files.
-    This process is "direct to S3" using three steps: 1. get S3 target URL from
-    Open Humans, 2. Perform the upload, 3. Notify Open Humans when complete.
-    """
-    # Get the S3 target from Open Humans.
-    upload_url = '{}?access_token={}'.format(
-        settings.OH_DIRECT_UPLOAD, oh_member.get_access_token())
-    req1 = requests.post(
-        upload_url,
-        data={'project_member_id': oh_member.oh_id,
-              'filename': os.path.basename(filepath),
-              'metadata': json.dumps(metadata)})
-    req1.raise_for_status()
-
-    # Upload to S3 target.
-    with open(filepath, 'rb') as fh:
-        req2 = requests.put(url=req1.json()['url'], data=fh)
-    req2.raise_for_status()
-
-    # Report completed upload to Open Humans.
-    complete_url = ('{}?access_token={}'.format(
-        settings.OH_DIRECT_UPLOAD_COMPLETE, oh_member.get_access_token()))
-    req3 = requests.post(
-        complete_url,
-        data={'project_member_id': oh_member.oh_id,
-              'file_id': req1.json()['id']})
-    req3.raise_for_status()
-
-    logger.debug('Upload done: "{}" for member {}.'.format(
-            os.path.basename(filepath), oh_member.oh_id))
+    if nokia_data != []:
+        # If there is existing data, look at it's metadata in oh, where there
+        # should be a timestamp
+        # member = api.exchange_oauth2_member(oh_access_token)
+        # for dfile in member['data']:
+        #     if 'nokiahealth' in dfile['metadata']['tags']:
+        #         start_time = dfile['metadata']['updated_at']
+        # parsed_time = dp.parse(start_time)
+        start_time = str(datetime.utcnow())
+        parsed_time = dp.parse(start_time)
+        return parsed_time
+    else:
+        # If the existing data is empty, query nokia to find when data starts
+        print("No existing nokia data, starting in 2009 when Withings began")
+        start_time = '2009-01-01 12:00:00.000000'
+        parsed_time = dp.parse(start_time)
+        return parsed_time
