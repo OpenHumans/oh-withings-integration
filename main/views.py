@@ -37,26 +37,8 @@ def complete_nokia(request):
 
     # Get the "verifier" out of the redirected URL
     verifier = request.GET['oauth_verifier']
-
-    # Create a new OAuth1 object using the resource owner key/secret
-    # from session data and using the verifier parsed from the URL (above)
-    oauth = OAuth1(client_key,
-                   client_secret=client_secret,
-                   resource_owner_key=request.session['resource_owner_key'],
-                   resource_owner_secret=request.
-                   session['resource_owner_secret'],
-                   verifier=verifier)
-
-    # Make a request to Nokia (final request) for an access token
-    r = requests.post(url=access_token_url, auth=oauth)
-    credentials = parse_qs(r.text)
-
-    # 4. Trigger fetch data task
-
-    oauth_token = credentials.get('oauth_token')[0]
-    oauth_token_secret = credentials.get('oauth_token_secret')[0]
-    userid = credentials.get('userid')[0]
-    deviceid = credentials.get('deviceid')[0]
+    resource_owner_key = request.session['resource_owner_key']
+    resource_owner_secret = request.session['resource_owner_secret']
 
     oh_id = request.user.oh_member.oh_id
     oh_user = OpenHumansMember.objects.get(oh_id=oh_id)
