@@ -24,11 +24,17 @@ logger = logging.getLogger(__name__)
 
 
 @shared_task
-def fetch_nokia_data(userid, client_key, client_secret, oauth_token,
-                     oauth_token_secret, nokia_data):
+def process_nokia(nokia_member):
     '''
     Fetch all nokia health data for a given user
     '''
+    userid = nokia_member['userid']
+    oauth_token = nokia_member['oauth_token']
+    oauth_token_secret = nokia_member['oauth_token_secret']
+    # # Fetch user's existing data from OH
+    # # We are going to use the pip package open-humans-api for this
+    # nokia_data = get_existing_nokia(oh_user.access_token)
+
     nokia_urls = [
         {'name': 'activity',
          'url': 'https://api.health.nokia.com/v2/measure?action=getactivity',
@@ -56,8 +62,8 @@ def fetch_nokia_data(userid, client_key, client_secret, oauth_token,
          'period': ''}
     ]
 
-    queryoauth = OAuth1(client_key,
-                        client_secret=client_secret,
+    queryoauth = OAuth1(client_key=settings.NOKIA_CONSUMER_KEY,
+                        client_secret=settings.NOKIA_CONSUMER_SECRET,
                         resource_owner_key=oauth_token,
                         resource_owner_secret=oauth_token_secret,
                         signature_type='query')

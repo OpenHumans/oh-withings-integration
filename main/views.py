@@ -4,9 +4,7 @@ import requests
 from django.contrib.auth import login
 from django.shortcuts import render, redirect
 from django.conf import settings
-from datauploader.tasks import (xfer_to_open_humans,
-                                fetch_nokia_data,
-                                get_existing_nokia)
+from datauploader.tasks import process_nokia
 from requests_oauthlib import OAuth1
 from urllib.parse import parse_qs
 from open_humans.models import OpenHumansMember
@@ -119,8 +117,9 @@ def complete(request):
               backend='django.contrib.auth.backends.ModelBackend')
 
         # Create an OAuth1 object, and obtain a request token
-        oauth = OAuth1(client_key, client_secret=client_secret,
-                       callback_uri=callback_uri)
+        oauth = OAuth1(settings.NOKIA_CONSUMER_KEY,
+                       client_secret=settings.NOKIA_CONSUMER_SECRET,
+                       callback_uri=settings.NOKIA_CALLBACK_URL)
         r = requests.post(url=request_token_url, auth=oauth)
 
         # Parse and save the resource owner key & secret (for use
