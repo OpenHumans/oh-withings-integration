@@ -101,19 +101,20 @@ def update_nokia(oh_member, userid, queryoauth, nokia_data):
                         str(userid) + '&startdateymd=' + str(start_ymd) +
                         '&enddateymd=' + str(stop_ymd)}
             ]
-            dataarray = []
-            for url in nokia_urls:
-                print(url['url'])
-                thisfetch = rr.get(url=url['url'], auth=queryoauth,
+
+            for i in range(0, len(nokia_urls)-1):
+                endpoint = nokia_urls[i]
+                keyname = endpoint['name']
+                print('url for {}'.format(keyname))
+                print(endpoint['url'])
+                thisfetch = rr.get(url=endpoint['url'], auth=queryoauth,
                                    realms=["Nokia"])
-                dataarray.append(thisfetch.text)
-
-            endpoints = ['"activity":', ',"measure":', ',"intraday":',
-                         ',"sleep":', ',"sleepsummary":', ',"workouts":']
-
-            for i in range(0, len(endpoints)-1):
-                key = endpoints[i]
-                nokia_data[key] = dataarray[i]
+                if nokia_data[keyname]:
+                    # If this data type already exists, append to it.
+                    nokia_data[keyname].append(thisfetch.text)
+                else:
+                    # If this data type does not exist, create the key.
+                    nokia_data[keyname] = [thisfetch.text]
 
     except RequestsRespectfulRateLimitedError:
         logger.debug(
