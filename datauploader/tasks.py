@@ -60,7 +60,7 @@ def update_nokia(oh_member, userid, queryoauth, nokia_data):
                             client_id=settings.OPENHUMANS_CLIENT_ID,
                             client_secret=settings.OPENHUMANS_CLIENT_SECRET)
     try:
-        # Set start date and end date (unix) for data fetch
+        # Set start date and end date for data fetch
         start_time = get_start_time(oh_access_token, nokia_data)
         start_ymd = start_time.strftime('%Y-%m-%d')
         start_epoch = start_time.strftime('%s')
@@ -161,28 +161,26 @@ def get_existing_nokia(oh_access_token):
             tf_in.flush()
             nokia_data = json.load(open(tf_in.name))
             return nokia_data
-    print("NOKIA DATA")
     return []
 
 
 def get_start_time(oh_access_token, nokia_data):
     """
-    Look at existing nokia data and find out the last date it fetches
+    Look at existing nokia data and find out the last date it was fetched
+    for. Start by looking at activity and then measure endpoints.
     """
-    if nokia_data != []:
-        # If there is existing data, look at it's metadata in oh, where there
-        # should be a timestamp
-        # member = api.exchange_oauth2_member(oh_access_token)
-        # for dfile in member['data']:
-        #     if 'nokiahealth' in dfile['metadata']['tags']:
-        #         start_time = dfile['metadata']['updated_at']
-        # parsed_time = dp.parse(start_time)
-        start_time = str(datetime.utcnow())
-        parsed_time = dp.parse(start_time)
-        return parsed_time
+    if nokia_data["activity"]["body"]["activities"][0]["date"]:
+        # If there is a date for activity, use this.
+        date_ymd = nokia_data["activity"]["body"]["activities"][0]["date"]
+        date_parsed = dp.parse(date_ymd)
+        return date_parsed
+    elif nokia_data["measure"]["body"]["measuregrps"][0]["date"]:
+        date_epoch = nokia_data["measure"]["body"]["measuregrps"][0]["date"]
+        date_parsed = time.localtime(date_epoch)
+        return date_parsed
     else:
         # If the existing data is empty, query nokia to find when data starts
         print("No existing nokia data, starting in 2009 when Withings began")
-        start_time = '2009-01-01 12:00:00.000000'
+        start_time = '2009-01-01'
         parsed_time = dp.parse(start_time)
         return parsed_time
