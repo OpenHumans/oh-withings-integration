@@ -170,30 +170,30 @@ def get_start_time(oh_access_token, nokia_data):
     Look at existing nokia data and find out the last date it was fetched
     for. Start by looking at activity and then measure endpoints.
     """
-    activity_data = nokia_data["activity"][0]
-    activity_data = activity_data.replace("true", "'true'")
-    activity_data = activity_data.replace("false", "'false'")
-    activity_data = ast.literal_eval(activity_data)
-
-    measure_data = nokia_data["measure"][0]
-    measure_data = measure_data.replace("true", "'true'")
-    measure_data = measure_data.replace("false", "'false'")
-    measure_data = ast.literal_eval(measure_data)
-    print(measure_data["body"]["updatetime"])
-
-    if activity_data["body"]["activities"][0]["date"]:
-        # If there is a date for activity, use this.
+    try:
+        # If there is activity data, proceed to check whether it has a date.
+        activity_data = nokia_data["activity"][0]
+        activity_data = activity_data.replace("true", "True")
+        activity_data = activity_data.replace("false", "False")
+        activity_data = ast.literal_eval(activity_data)
         date_ymd = activity_data["body"]["activities"][0]["date"]
         date_parsed = dp.parse(date_ymd)
         return date_parsed
-    elif measure_data["body"]["updatetime"]:
-        date_epoch = measure_data["body"]["updatetime"]
-        date_struct = time.localtime(date_epoch)
-        date_parsed = datetime.datetime(*date_struct[:3])
-        return date_parsed
-    else:
-        # If the existing data is empty, query nokia to find when data starts
-        print("No existing nokia data, starting in 2009 when Withings began")
-        start_time = '2009-01-01'
-        parsed_time = dp.parse(start_time)
-        return parsed_time
+    except:
+        try:
+            # If there is measure data, proceed to check whether it has a date.
+            measure_data = nokia_data["measure"][0]
+            measure_data = measure_data.replace("true", "True")
+            measure_data = measure_data.replace("false", "False")
+            measure_data = ast.literal_eval(measure_data)
+            date_epoch = measure_data["body"]["updatetime"]
+            date_struct = time.localtime(date_epoch)
+            date_parsed = datetime.datetime(*date_struct[:3])
+            return date_parsed
+        except:
+            # If we can't get a date from activity or measure endpoints, just
+            # use the 2009 which is when Withings began.
+            print("No existing nokia data, using 2009, when Withings began")
+            start_time = '2009-01-01'
+            date_parsed = dp.parse(start_time)
+            return date_parsed
