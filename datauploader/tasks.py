@@ -41,7 +41,7 @@ def process_nokia(oh_id):
                             client_secret=settings.OPENHUMANS_CLIENT_SECRET)
 
     nokia_data = get_existing_nokia(oh_access_token)
-    nokia_member = oh_member.nokiahealthmember
+    nokia_member = oh_member.nokia_member
     userid = nokia_member.userid
     oauth_token = nokia_member.oauth_token
     oauth_token_secret = nokia_member.oauth_token_secret
@@ -110,10 +110,16 @@ def update_nokia(oh_member, userid, queryoauth, nokia_data):
                 print(endpoint['url'])
                 thisfetch = rr.get(url=endpoint['url'], auth=queryoauth,
                                    realms=["Nokia"])
+                # print(thisfetch.text)
+                print(nokia_data)
                 if nokia_data[keyname]:
+                    print("Adding to existing")
                     # If this data type already exists, append to it.
+                    print(nokia_data[keyname])
+                    print(type(nokia_data[keyname]))
                     nokia_data[keyname].append(thisfetch.text)
                 else:
+                    print("Creating new endpoint array for {}".format(keyname))
                     # If this data type does not exist, create the key.
                     nokia_data[keyname] = [thisfetch.text]
 
@@ -131,6 +137,7 @@ def replace_nokia(oh_member, nokia_data):
     """
     Delete any old file and upload new
     """
+    print(nokia_data)
     tmp_directory = tempfile.mkdtemp()
     metadata = {
         'tags': ['nokiahealth', 'health', 'measure'],
@@ -162,7 +169,7 @@ def get_existing_nokia(oh_access_token):
             tf_in.flush()
             nokia_data = json.load(open(tf_in.name))
             return nokia_data
-    return []
+    return {}
 
 
 def get_start_time(oh_access_token, nokia_data):

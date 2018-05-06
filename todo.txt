@@ -1,0 +1,7 @@
+- [ ] add Celery beat timed task?
+- [ ] trigger data update for each user
+- [ ] fix rate limiting workflow
+- [ ] per user realms for rr?
+- [x] move data fetch to Celery (out of `views.py`)
+- [x] more requests-respectful setup to `settings.py`
+- [ ] find out why build is failing 

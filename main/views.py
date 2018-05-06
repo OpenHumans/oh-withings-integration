@@ -83,12 +83,19 @@ def nokia_make_member(verifier, resource_owner_key,
         userid = credentials.get('userid')[0]
         deviceid = credentials.get('deviceid')[0]
 
-        nokia_member = NokiaHealthMember.objects.get_or_create(
-            user=oh_user,
-            userid=userid,
-            deviceid=deviceid,
-            oauth_token=oauth_token,
-            oauth_token_secret=oauth_token_secret)
+        try:
+            nokia_member = NokiaHealthMember.objects.get(userid=userid)
+            nokia_member.deviceid = deviceid
+            nokia_member.oauth_token = oauth_token
+            nokia_member.oauth_token_secret = oauth_token_secret
+            nokia_member.save()
+        except NokiaHealthMember.DoesNotExist:
+            nokia_member, created = NokiaHealthMember.objects.get_or_create(
+                user=oh_user,
+                userid=userid,
+                deviceid=deviceid,
+                oauth_token=oauth_token,
+                oauth_token_secret=oauth_token_secret)
 
         return nokia_member
 
