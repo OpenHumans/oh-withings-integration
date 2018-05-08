@@ -111,8 +111,7 @@ def update_nokia(oh_member, userid, queryoauth, nokia_data):
                 thisfetch = rr.get(url=endpoint['url'], auth=queryoauth,
                                    realms=["Nokia"])
                 # print(thisfetch.text)
-                print(nokia_data)
-                if nokia_data[keyname]:
+                if keyname in nokia_data.keys():
                     print("Adding to existing")
                     # If this data type already exists, append to it.
                     print(nokia_data[keyname])
@@ -140,7 +139,7 @@ def replace_nokia(oh_member, nokia_data):
     print(nokia_data)
     tmp_directory = tempfile.mkdtemp()
     metadata = {
-        'tags': ['nokiahealth', 'health', 'measure'],
+        'tags': ['nokia', 'health', 'measure'],
         'description': 'File with Nokia Health data',
         'updated_at': str(datetime.utcnow()),
     }
@@ -161,13 +160,16 @@ def replace_nokia(oh_member, nokia_data):
 
 def get_existing_nokia(oh_access_token):
     member = api.exchange_oauth2_member(oh_access_token)
+    print(member)
     for dfile in member['data']:
-        if 'nokiahealth' in dfile['metadata']['tags']:
+        if 'nokia' in dfile['metadata']['tags']:
             # get file here and read the json into memory
             tf_in = tempfile.NamedTemporaryFile(suffix='.json')
             tf_in.write(requests.get(dfile['download_url']).content)
             tf_in.flush()
             nokia_data = json.load(open(tf_in.name))
+            print("getting existing data:")
+            print(type(nokia_data))
             return nokia_data
     return {}
 
