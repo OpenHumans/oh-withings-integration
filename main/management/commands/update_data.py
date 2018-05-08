@@ -1,26 +1,19 @@
 from django.core.management.base import BaseCommand
 from main.models import NokiaHealthMember
-from main.views import fetch_nokia_data
-import logging
-import schedule
-import time
-
-logger = logging.getLogger(__name__)
+from open_humans.models import OpenHumansMember
+from fitbit.settings import OPENHUMANS_CLIENT_ID, OPENHUMANS_CLIENT_SECRET
 
 
 class Command(BaseCommand):
-    help = 'Updates data for all members'
+    help = 'Update data for all users'
 
     def handle(self, *args, **options):
-        # users = NokiaHealthMember.objects.all()
-        # for user in users:
-        #     fetch_nokia_data(user, user.access_token)
-        logger.debug('hello')
+        # OH token refresh (for all users)
+        oh_users = OpenHumansMember.objects.all()
+        for user in users:
+            user._refresh_tokens(OPENHUMANS_CLIENT_ID, OPENHUMANS_CLIENT_SECRET)
 
-    # schedule.every().wednesday.at("20:00").do(handle)
-    schedule.every(1).minutes.do(handle)
-
-
-while True:
-    schedule.run_pending()
-    time.sleep(1)
+        # Nokia token refresh (for all users)
+        nokia_users = NokiaHealthMember.objects.all()
+        for user in users:
+            user._refresh_tokens()

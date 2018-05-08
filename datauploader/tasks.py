@@ -12,6 +12,7 @@ import tempfile
 import requests
 import arrow
 import time
+import ast
 import dateutil.parser as dp
 
 from celery import shared_task
@@ -40,7 +41,7 @@ def process_nokia(oh_id):
                             client_secret=settings.OPENHUMANS_CLIENT_SECRET)
 
     nokia_data = get_existing_nokia(oh_access_token)
-    nokia_member = oh_member.nokiahealthmember
+    nokia_member = oh_member.nokia_member
     userid = nokia_member.userid
     oauth_token = nokia_member.oauth_token
     oauth_token_secret = nokia_member.oauth_token_secret
@@ -60,7 +61,7 @@ def update_nokia(oh_member, userid, queryoauth, nokia_data):
                             client_id=settings.OPENHUMANS_CLIENT_ID,
                             client_secret=settings.OPENHUMANS_CLIENT_SECRET)
     try:
-        # Set start date and end date (unix) for data fetch
+        # Set start date and end date for data fetch
         start_time = get_start_time(oh_access_token, nokia_data)
         start_ymd = start_time.strftime('%Y-%m-%d')
         start_epoch = start_time.strftime('%s')
@@ -101,19 +102,25 @@ def update_nokia(oh_member, userid, queryoauth, nokia_data):
                         str(userid) + '&startdateymd=' + str(start_ymd) +
                         '&enddateymd=' + str(stop_ymd)}
             ]
-            dataarray = []
-            for url in nokia_urls:
-                print(url['url'])
-                thisfetch = rr.get(url=url['url'], auth=queryoauth,
+
+            for i in range(0, len(nokia_urls)-1):
+                endpoint = nokia_urls[i]
+                keyname = endpoint['name']
+                print('url for {}'.format(keyname))
+                print(endpoint['url'])
+                thisfetch = rr.get(url=endpoint['url'], auth=queryoauth,
                                    realms=["Nokia"])
-                dataarray.append(thisfetch.text)
-
-            endpoints = ['"activity":', ',"measure":', ',"intraday":',
-                         ',"sleep":', ',"sleepsummary":', ',"workouts":']
-
-            for i in range(0, len(endpoints)-1):
-                key = endpoints[i]
-                nokia_data[key] = dataarray[i]
+                # print(thisfetch.text)
+                if keyname in nokia_data.keys():
+                    print("Adding to existing")
+                    # If this data type already exists, append to it.
+                    print(nokia_data[keyname])
+                    print(type(nokia_data[keyname]))
+                    nokia_data[keyname].append(thisfetch.text)
+                else:
+                    print("Creating new endpoint array for {}".format(keyname))
+                    # If this data type does not exist, create the key.
+                    nokia_data[keyname] = [thisfetch.text]
 
     except RequestsRespectfulRateLimitedError:
         logger.debug(
@@ -129,9 +136,10 @@ def replace_nokia(oh_member, nokia_data):
     """
     Delete any old file and upload new
     """
+    print(nokia_data)
     tmp_directory = tempfile.mkdtemp()
     metadata = {
-        'tags': ['nokiahealth', 'health', 'measure'],
+        'tags': ['nokia', 'health', 'measure'],
         'description': 'File with Nokia Health data',
         'updated_at': str(datetime.utcnow()),
     }
@@ -152,36 +160,49 @@ def replace_nokia(oh_member, nokia_data):
 
 def get_existing_nokia(oh_access_token):
     member = api.exchange_oauth2_member(oh_access_token)
+    print(member)
     for dfile in member['data']:
-        if 'nokiahealth' in dfile['metadata']['tags']:
+        if 'nokia' in dfile['metadata']['tags']:
             # get file here and read the json into memory
             tf_in = tempfile.NamedTemporaryFile(suffix='.json')
             tf_in.write(requests.get(dfile['download_url']).content)
             tf_in.flush()
             nokia_data = json.load(open(tf_in.name))
+            print("getting existing data:")
+            print(type(nokia_data))
             return nokia_data
-    print("NOKIA DATA")
-    return []
+    return {}
 
 
 def get_start_time(oh_access_token, nokia_data):
     """
-    Look at existing nokia data and find out the last date it fetches
+    Look at existing nokia data and find out the last date it was fetched
+    for. Start by looking at activity and then measure endpoints.
     """
-    if nokia_data != []:
-        # If there is existing data, look at it's metadata in oh, where there
-        # should be a timestamp
-        # member = api.exchange_oauth2_member(oh_access_token)
-        # for dfile in member['data']:
-        #     if 'nokiahealth' in dfile['metadata']['tags']:
-        #         start_time = dfile['metadata']['updated_at']
-        # parsed_time = dp.parse(start_time)
-        start_time = str(datetime.utcnow())
-        parsed_time = dp.parse(start_time)
-        return parsed_time
-    else:
-        # If the existing data is empty, query nokia to find when data starts
-        print("No existing nokia data, starting in 2009 when Withings began")
-        start_time = '2009-01-01 12:00:00.000000'
-        parsed_time = dp.parse(start_time)
-        return parsed_time
+    try:
+        # If there is activity data, proceed to check whether it has a date.
+        activity_data = nokia_data["activity"][0]
+        activity_data = activity_data.replace("true", "True")
+        activity_data = activity_data.replace("false", "False")
+        activity_data = ast.literal_eval(activity_data)
+        date_ymd = activity_data["body"]["activities"][0]["date"]
+        date_parsed = dp.parse(date_ymd)
+        return date_parsed
+    except:
+        try:
+            # If there is measure data, proceed to check whether it has a date.
+            measure_data = nokia_data["measure"][0]
+            measure_data = measure_data.replace("true", "True")
+            measure_data = measure_data.replace("false", "False")
+            measure_data = ast.literal_eval(measure_data)
+            date_epoch = measure_data["body"]["updatetime"]
+            date_struct = time.localtime(date_epoch)
+            date_parsed = datetime.datetime(*date_struct[:3])
+            return date_parsed
+        except:
+            # If we can't get a date from activity or measure endpoints, just
+            # use the 2009 which is when Withings began.
+            print("No existing nokia data, using 2009, when Withings began")
+            start_time = '2009-01-01'
+            date_parsed = dp.parse(start_time)
+            return date_parsed
