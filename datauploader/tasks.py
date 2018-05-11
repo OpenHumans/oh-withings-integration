@@ -193,11 +193,12 @@ def get_start_time(oh_access_token, nokia_data):
     """
     try:
         # If there is activity data, proceed to check whether it has a date.
-        activity_data = nokia_data["activity"][0]
+        activity_data = nokia_data["activity"][-1]
         activity_data = activity_data.replace("true", "True")
         activity_data = activity_data.replace("false", "False")
         activity_data = ast.literal_eval(activity_data)
-        date_ymd = activity_data["body"]["activities"][0]["date"]
+
+        date_ymd = activity_data["body"]["activities"][-1]["date"]
         date_parsed = dp.parse(date_ymd)
 
         print("Start date:")
