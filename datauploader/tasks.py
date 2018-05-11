@@ -101,8 +101,7 @@ def update_nokia(oh_member, userid, queryoauth, nokia_data):
                         '/v2/measure?action=getworkouts&userid=' +
                         str(userid) + '&startdateymd=' + str(start_ymd)}
             ]
-
-            for i in range(0, len(nokia_urls)-1):
+            for i in range(0, len(nokia_urls)):
                 endpoint = nokia_urls[i]
                 keyname = endpoint['name']
                 print('url for {}'.format(keyname))
