@@ -145,10 +145,9 @@ def replace_nokia(oh_member, nokia_data):
     """
     Delete any old file and upload new
     """
-    print(nokia_data)
     tmp_directory = tempfile.mkdtemp()
     metadata = {
-        'tags': ['nokia', 'health', 'measure'],
+        'tags': ['nokia2', 'health', 'measure'],
         'description': 'File with Nokia Health data',
         'updated_at': str(datetime.utcnow()),
     }
@@ -168,10 +167,11 @@ def replace_nokia(oh_member, nokia_data):
 
 
 def get_existing_nokia(oh_access_token):
+    print("Entering get_existing_nokia function...")
     member = api.exchange_oauth2_member(oh_access_token)
-    print(member)
     for dfile in member['data']:
-        if 'nokia' in dfile['metadata']['tags']:
+        if 'nokia2' in dfile['metadata']['tags']:
+            print("Found file with tag...")
             # get file here and read the json into memory
             tf_in = tempfile.NamedTemporaryFile(suffix='.json')
             tf_in.write(requests.get(dfile['download_url']).content)
@@ -179,7 +179,10 @@ def get_existing_nokia(oh_access_token):
             nokia_data = json.load(open(tf_in.name))
             print("getting existing data:")
             print(type(nokia_data))
+            for key in nokia_data:
+                print(key)
             return nokia_data
+    print('no existing data with nokia tag')
     return {}
 
 
@@ -196,8 +199,12 @@ def get_start_time(oh_access_token, nokia_data):
         activity_data = ast.literal_eval(activity_data)
         date_ymd = activity_data["body"]["activities"][0]["date"]
         date_parsed = dp.parse(date_ymd)
+
+        print("Start date:")
+        print(date_parsed)
         return date_parsed
     except:
+        print("Couldn't get date from activity... trying with measure")
         try:
             # If there is measure data, proceed to check whether it has a date.
             measure_data = nokia_data["measure"][0]
@@ -207,6 +214,8 @@ def get_start_time(oh_access_token, nokia_data):
             date_epoch = measure_data["body"]["updatetime"]
             date_struct = time.localtime(date_epoch)
             date_parsed = datetime.datetime(*date_struct[:3])
+            print(date_ymd)
+            print(date_parsed)
             return date_parsed
         except:
             # If we can't get a date from activity or measure endpoints, just
