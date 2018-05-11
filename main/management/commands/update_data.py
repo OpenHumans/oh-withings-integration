@@ -10,7 +10,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         # OH token refresh (for all users)
         oh_users = OpenHumansMember.objects.all()
-        for user in users:
+        for user in oh_users:
             user._refresh_tokens(OPENHUMANS_CLIENT_ID, OPENHUMANS_CLIENT_SECRET)
 
         # Nokia token refresh (for all users)
