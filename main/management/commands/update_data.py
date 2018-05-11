@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 from main.models import NokiaHealthMember
 from open_humans.models import OpenHumansMember
-from fitbit.settings import OPENHUMANS_CLIENT_ID, OPENHUMANS_CLIENT_SECRET
+from nokia.settings import OPENHUMANS_CLIENT_ID, OPENHUMANS_CLIENT_SECRET
 
 
 class Command(BaseCommand):
