@@ -112,21 +112,31 @@ def update_nokia(oh_member, userid, queryoauth, nokia_data):
                 if keyname in nokia_data.keys():
                     print("Adding to existing")
                     # If this data type already exists, append to it.
-                    print(nokia_data[keyname])
+                    # print(nokia_data[keyname])
                     print(type(nokia_data[keyname]))
                     nokia_data[keyname].append(thisfetch.text)
                 else:
                     print("Creating new endpoint array for {}".format(keyname))
                     # If this data type does not exist, create the key.
                     nokia_data[keyname] = [thisfetch.text]
-
+            print("start_ymd:")
+            print(start_ymd)
+            print("start_epoch:")
+            print(start_epoch)
+            start_time = start_time + timedelta(days=7)
+            start_ymd = start_time.strftime('%Y-%m-%d')
+            start_epoch = start_time.strftime('%s')
+            print("start_ymd:")
+            print(start_ymd)
+            print("start_epoch:")
+            print(start_epoch)
     except RequestsRespectfulRateLimitedError:
         print('Hit limit requeue request')
         logger.debug(
             'Requeued processing for {} with 60s delay'.format(
                 oh_member.oh_id)
         )
-        # process_nokia.apply_async(args=[oh_member.oh_id], countdown=61)
+        process_nokia.apply_async(args=[oh_member.oh_id], countdown=61)
     finally:
         replace_nokia(oh_member, nokia_data)
 
