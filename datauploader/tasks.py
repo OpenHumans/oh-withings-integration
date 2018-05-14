@@ -125,17 +125,17 @@ def update_nokia(oh_member, userid, queryoauth, nokia_data):
                     print("Creating new endpoint array for {}".format(keyname))
                     # If this data type does not exist, create the key.
                     nokia_data[keyname] = [thisfetch.text]
-            print("start_ymd:")
-            print(start_ymd)
-            print("start_epoch:")
-            print(start_epoch)
-            start_time = start_time + timedelta(days=7)
+            print("start_ymd: {} start_epoch: {}".format(start_ymd, start_epoch))
+            start_time = stop_time + timedelta(days=1)
             start_ymd = start_time.strftime('%Y-%m-%d')
             start_epoch = start_time.strftime('%s')
-            print("start_ymd:")
-            print(start_ymd)
-            print("start_epoch:")
-            print(start_epoch)
+            print("start_ymd: {} start_epoch: {}".format(start_ymd, start_epoch))
+            print("stop_ymd: {} stop_epoch: {}".format(stop_ymd, stop_epoch))
+            stop_time = stop_time + timedelta(days=8)
+            stop_ymd = stop_time.strftime('%Y-%m-%d')
+            stop_epoch = stop_time.strftime('%s')
+            print("stop_ymd: {} stop_epoch: {}".format(stop_ymd, stop_epoch))
+
     except RequestsRespectfulRateLimitedError:
         print('Hit limit requeue request')
         logger.debug(
