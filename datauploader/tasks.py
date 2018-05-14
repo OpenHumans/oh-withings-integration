@@ -197,6 +197,50 @@ def get_start_time(oh_access_token, nokia_data):
     Look at existing nokia data and find out the last date it was fetched
     for. Start by looking at activity and then measure endpoints.
     """
+    if nokia_data != {}:
+        try:
+            # If there is activity data, check whether it has a date
+            activity_data = nokia_data["activity"][-1]
+            activity_data = activity_data.replace("true", "True")
+            activity_data = activity_data.replace("false", "False")
+            activity_data = ast.literal_eval(activity_data)
+
+            date_ymd = activity_data["body"]["activities"][-1]["date"]
+            date_parsed = dp.parse(date_ymd)
+
+            print("Start date:")
+            print(date_parsed)
+            return date_parsed
+        except:
+            print("Couldn't get date from activity... trying with measure")
+            try:
+                # If there is measure data, check whether it has a date
+                measure_data = nokia_data["measure"][-1]
+                measure_data = measure_data.replace("true", "True")
+                measure_data = measure_data.replace("false", "False")
+                measure_data = ast.literal_eval(measure_data)
+                date_epoch = measure_data["body"]["updatetime"]
+                date_struct = time.localtime(date_epoch)
+                date_parsed = datetime.datetime(*date_struct[:3])
+                print(date_ymd)
+                print(date_parsed)
+                return date_parsed
+            except:
+                # If we can't get a date from activity or measure endpoints,
+                # don't return a date.
+                return None
+    else:
+        # If there is no existing data, don't return a date.
+        return None
+
+
+def get_start_time_no_existing(userid, queryoauth):
+    # Fetch activity data with no date given.
+    fetch = rr.get(url='https://api.health.nokia.com/v2/' +
+                       'measure?action=getactivity&userid=' +
+                       str(userid), auth=queryoauth, realms=["Nokia"])
+    activity_data = fetch.text
+    print("activity data: {}".format(activity_data))
     try:
         # If there is activity data, proceed to check whether it has a date.
         activity_data = nokia_data["activity"][-1]
