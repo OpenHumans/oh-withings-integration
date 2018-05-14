@@ -242,36 +242,12 @@ def get_start_time_no_existing(userid, queryoauth):
     activity_data = fetch.text
     print("activity data: {}".format(activity_data))
     try:
-        # If there is activity data, proceed to check whether it has a date.
-        activity_data = nokia_data["activity"][-1]
+        # If we get data with a date, use that date.
         activity_data = activity_data.replace("true", "True")
         activity_data = activity_data.replace("false", "False")
         activity_data = ast.literal_eval(activity_data)
-
         date_ymd = activity_data["body"]["activities"][-1]["date"]
-        date_parsed = dp.parse(date_ymd)
-
-        print("Start date:")
-        print(date_parsed)
-        return date_parsed
+        print("dateymd: {}".format(date_ymd))
     except:
-        print("Couldn't get date from activity... trying with measure")
-        try:
-            # If there is measure data, proceed to check whether it has a date.
-            measure_data = nokia_data["measure"][0]
-            measure_data = measure_data.replace("true", "True")
-            measure_data = measure_data.replace("false", "False")
-            measure_data = ast.literal_eval(measure_data)
-            date_epoch = measure_data["body"]["updatetime"]
-            date_struct = time.localtime(date_epoch)
-            date_parsed = datetime.datetime(*date_struct[:3])
-            print(date_ymd)
-            print(date_parsed)
-            return date_parsed
-        except:
-            # If we can't get a date from activity or measure endpoints, just
-            # use the 2009 which is when Withings began.
-            print("No existing nokia data, using 2009, when Withings began")
-            start_time = '2009-01-01'
-            date_parsed = dp.parse(start_time)
-            return date_parsed
+        # If there is no data with a date, don't return a date.
+        return None
