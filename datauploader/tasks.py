@@ -63,6 +63,11 @@ def update_nokia(oh_member, userid, queryoauth, nokia_data):
     try:
         # Set start date and end date for data fetch
         start_time = get_start_time(oh_access_token, nokia_data)
+        if not start_time:
+            start_time = get_start_time_no_existing(userid, queryoauth)
+        if not start_time:
+            print("No data available from Nokia")
+            return None
         start_ymd = start_time.strftime('%Y-%m-%d')
         start_epoch = start_time.strftime('%s')
 
