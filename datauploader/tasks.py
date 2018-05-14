@@ -80,11 +80,13 @@ def update_nokia(oh_member, userid, queryoauth, nokia_data):
                 {'name': 'activity',
                  'url': 'https://api.health.nokia.com/v2/' +
                         'measure?action=getactivity&userid=' + str(userid) +
-                        '&startdateymd=' + str(start_ymd)},
+                        '&startdateymd=' + str(start_ymd) +
+                        '&enddateymd=' + str(stop_ymd)},
                 {'name': 'measure',
                  'url': 'https://api.health.nokia.com' +
                         '/measure?action=getmeas&userid=' + str(userid) +
-                        '&startdate=' + str(start_epoch)},
+                        '&startdate=' + str(start_epoch) +
+                        '&enddate=' + str(stop_epoch)},
                 {'name': 'intraday',
                  'url': 'https://api.health.nokia.com' +
                         '/v2/measure?action=getintradayactivity' +
@@ -102,7 +104,8 @@ def update_nokia(oh_member, userid, queryoauth, nokia_data):
                 {'name': 'workouts',
                  'url': 'https://api.health.nokia.com' +
                         '/v2/measure?action=getworkouts&userid=' +
-                        str(userid) + '&startdateymd=' + str(start_ymd)}
+                        str(userid) + '&startdateymd=' + str(start_ymd) +
+                        '&enddateymd=' + str(stop_ymd)}
             ]
             for i in range(0, len(nokia_urls)):
                 endpoint = nokia_urls[i]
