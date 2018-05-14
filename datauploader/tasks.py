@@ -66,13 +66,16 @@ def update_nokia(oh_member, userid, queryoauth, nokia_data):
         start_ymd = start_time.strftime('%Y-%m-%d')
         start_epoch = start_time.strftime('%s')
 
-        stop_time = datetime.utcnow() + timedelta(days=7)
+        stop_time = start_time + timedelta(days=7)
         stop_ymd = stop_time.strftime('%Y-%m-%d')
         stop_epoch = stop_time.strftime('%s')
 
-        while start_ymd != stop_ymd:
-            print('processing {} for member {}'.format(start_ymd,
-                                                          oh_member.oh_id))
+        end_time = datetime.utcnow() + timedelta(days=7)
+        end_ymd = end_time.strftime('%Y-%m-%d')
+        end_epoch = end_time.strftime('%s')
+
+        while stop_ymd < end_ymd:
+            print('processing fromn {} to {} for member {}'.format(start_ymd, stop_ymd, oh_member.oh_id))
             nokia_urls = [
                 {'name': 'activity',
                  'url': 'https://api.health.nokia.com/v2/' +
