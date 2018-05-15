@@ -235,24 +235,3 @@ def get_start_time(oh_access_token, nokia_data):
     else:
         # If there is no existing data, don't return a date.
         return None
-
-
-def get_start_time_no_existing(userid, queryoauth):
-    # Fetch activity data with no date given.
-    start_ymd = "2009-01-01"
-    stop_time = datetime.utcnow()
-    stop_ymd = stop_time.strftime('%Y-%m-%d')
-    url = 'https://api.health.nokia.com/v2/measure?action=getactivity&userid=' + str(userid) + '&startdateymd=' + str(start_ymd) + '&enddateymd=' + str(stop_ymd)
-    fetch = rr.get(url=url, auth=queryoauth, realms=["Nokia"])
-    activity_data = fetch.text
-    print("activity data: {}".format(activity_data))
-    try:
-        # If we get data with a date, use that date.
-        activity_data = activity_data.replace("true", "True")
-        activity_data = activity_data.replace("false", "False")
-        activity_data = ast.literal_eval(activity_data)
-        date_ymd = activity_data["body"]["activities"][-1]["date"]
-        print("dateymd: {}".format(date_ymd))
-    except:
-        # If there is no data with a date, don't return a date.
-        return None
