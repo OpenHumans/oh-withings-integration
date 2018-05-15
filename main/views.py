@@ -100,14 +100,19 @@ def dashboard(request):
             allow_update = False
             nokia_member = ''
             download_file = ''
-            connect_url = (authorization_url)
-        context = {
-            'oh_member': request.user.oh_member,
-            'nokia_member': nokia_member,
-            'download_file': download_file,
-            'connect_url': connect_url,
-            'allow_update': allow_update
-        }
+
+            # Generate the authorization URL
+            authorize_url = authorization_url + '?oauth_token='
+            authorize_url = authorize_url + request.session['resource_owner_key']
+
+            connect_url = (authorize_url)
+            context = {
+                'oh_member': request.user.oh_member,
+                'nokia_member': nokia_member,
+                'download_file': download_file,
+                'connect_url': connect_url,
+                'allow_update': allow_update
+            }
         return render(request, 'main/dashboard.html',
                       context=context)
     return redirect("/")
