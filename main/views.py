@@ -77,7 +77,70 @@ def complete(request):
             return render(request, 'main/complete.html', context=context)
         return redirect("/dashboard")
 
-    return render(request, 'main/index.html', context=context)
+    logger.debug('Invalid code exchange. User returned to starting page.')
+    return redirect('/')
+
+
+def dashboard(request):
+    if request.user.is_authenticated:
+        if hasattr(request.user.oh_member, 'nokiahealthmember'):
+            nokia_member = request.user.oh_member.nokiahealthmember
+            download_file = get_nokia_file(request.user.oh_member)
+            if download_file == 'error':
+                logout(request)
+                return redirect("/")
+            connect_url = ''
+            allow_update = check_update(nokia_member)
+        else:
+            allow_update = False
+            nokia_member = ''
+            download_file = ''
+            connect_url = (authorization_url)
+        context = {
+            'oh_member': request.user.oh_member,
+            'nokia_member': nokia_member,
+            'download_file': download_file,
+            'connect_url': connect_url,
+            'allow_update': allow_update
+        }
+        return render(request, 'main/dashboard.html',
+                      context=context)
+    return redirect("/")
+
+
+def remove_nokia(request):
+    if request.method == "POST" and request.user.is_authenticated:
+        try:
+            oh_member = request.user.oh_member
+            api.delete_file(oh_member.access_token,
+                            oh_member.oh_id,
+                            file_basename="nokia_data")
+            messages.info(request, "Your Nokia account has been removed")
+            nokia_account = request.user.oh_member.nokiahealthmember
+            nokia_account.delete()
+        except:
+            nokia_account = request.user.oh_member.nokiahealthmember
+            nokia_account.delete()
+            messages.info(request, ("Something went wrong, please"
+                          "re-authorize us on Open Humans"))
+            logout(request)
+            return redirect('/')
+    return redirect('/dashboard')
+
+
+def update_data(request):
+    if request.method == "POST" and request.user.is_authenticated:
+        oh_member = request.user.oh_member
+        process_nokia.delay(oh_member.oh_id)
+        nokia_member = oh_member.nokiahealthmember
+        nokia_member.last_submitted = arrow.now().format()
+        nokia_member.save()
+        messages.info(request,
+                      ("An update of your Nokia Health data has been started! "
+                       "It can take a few minutes before the first data is "
+                       "available. Reload this page in a while to find your "
+                       "data"))
+        return redirect('/dashboard')
 
 
 def complete_nokia(request):
