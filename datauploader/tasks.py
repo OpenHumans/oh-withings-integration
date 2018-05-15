@@ -53,10 +53,10 @@ def process_nokia(oh_id):
                         signature_type='query')
 
     print('Calling update_nokia function')
-    update_nokia(oh_member, userid, queryoauth, nokia_data)
+    update_nokia(oh_member, userid, queryoauth, nokia_data, oauth_token)
 
 
-def update_nokia(oh_member, userid, queryoauth, nokia_data):
+def update_nokia(oh_member, userid, queryoauth, nokia_data, oauth_token):
     oh_access_token = oh_member.get_access_token(
                             client_id=settings.OPENHUMANS_CLIENT_ID,
                             client_secret=settings.OPENHUMANS_CLIENT_SECRET)
@@ -74,7 +74,7 @@ def update_nokia(oh_member, userid, queryoauth, nokia_data):
         stop_ymd = stop_time.strftime('%Y-%m-%d')
         stop_epoch = stop_time.strftime('%s')
 
-        infourl = 'https://api.health.nokia.com/v2/measure?action=getinfo&userid=' + str(userid)
+        infourl = 'https://api.health.nokia.com/user?action=getinfo&access_token=' + str(oauth_token)
         userinfo = rr.get(url=infourl, auth=queryoauth, realms=["Nokia"])
         print(userinfo.text)
 
