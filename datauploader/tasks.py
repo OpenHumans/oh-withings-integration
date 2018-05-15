@@ -74,9 +74,9 @@ def update_nokia(oh_member, userid, queryoauth, nokia_data):
         stop_ymd = stop_time.strftime('%Y-%m-%d')
         stop_epoch = stop_time.strftime('%s')
 
-        end_time = datetime.utcnow() + timedelta(days=7)
-        end_ymd = end_time.strftime('%Y-%m-%d')
-        end_epoch = end_time.strftime('%s')
+        infourl = 'https://api.health.nokia.com/v2/measure?action=getinfo&userid=' + str(userid)
+        userinfo = rr.get(url=infourl, auth=queryoauth, realms=["Nokia"])
+        print(userinfo.text)
 
         while stop_ymd < end_ymd:
             print('processing fromn {} to {} for member {}'.format(start_ymd, stop_ymd, oh_member.oh_id))
