@@ -78,67 +78,66 @@ def update_nokia(oh_member, userid, queryoauth, nokia_data):
         userinfo = rr.get(url=infourl, auth=queryoauth, realms=["Nokia"])
         print(userinfo.text)
 
-        while stop_ymd < end_ymd:
-            print('processing fromn {} to {} for member {}'.format(start_ymd, stop_ymd, oh_member.oh_id))
-            nokia_urls = [
-                {'name': 'activity',
-                 'url': 'https://api.health.nokia.com/v2/' +
-                        'measure?action=getactivity&userid=' + str(userid) +
-                        '&startdateymd=' + str(start_ymd) +
-                        '&enddateymd=' + str(stop_ymd)},
-                {'name': 'measure',
-                 'url': 'https://api.health.nokia.com' +
-                        '/measure?action=getmeas&userid=' + str(userid) +
-                        '&startdate=' + str(start_epoch) +
-                        '&enddate=' + str(stop_epoch)},
-                {'name': 'intraday',
-                 'url': 'https://api.health.nokia.com' +
-                        '/v2/measure?action=getintradayactivity' +
-                        str(userid) + '&startdate=' + str(start_epoch) +
-                        '&enddate=' + str(stop_epoch)},
-                {'name': 'sleep',
-                 'url': 'https://api.health.nokia.com/v2/sleep?' +
-                        'action=get&startdate=' + str(start_epoch) +
-                        '&enddate=' + str(stop_epoch) + '&userid=' +
-                        str(userid)},
-                {'name': 'sleep_summary',
-                 'url': 'https://api.health.nokia.com' +
-                        '/v2/sleep?action=getsummary&startdateymd=' +
-                        str(start_ymd) + '&enddateymd=' + str(stop_ymd)},
-                {'name': 'workouts',
-                 'url': 'https://api.health.nokia.com' +
-                        '/v2/measure?action=getworkouts&userid=' +
-                        str(userid) + '&startdateymd=' + str(start_ymd) +
-                        '&enddateymd=' + str(stop_ymd)}
-            ]
-            for i in range(0, len(nokia_urls)):
-                endpoint = nokia_urls[i]
-                keyname = endpoint['name']
-                print('url for {}'.format(keyname))
-                print(endpoint['url'])
-                thisfetch = rr.get(url=endpoint['url'], auth=queryoauth,
-                                   realms=["Nokia"])
-                # print(thisfetch.text)
-                if keyname in nokia_data.keys():
-                    print("Adding to existing")
-                    # If this data type already exists, append to it.
-                    # print(nokia_data[keyname])
-                    print(type(nokia_data[keyname]))
-                    nokia_data[keyname].append(thisfetch.text)
-                else:
-                    print("Creating new endpoint array for {}".format(keyname))
-                    # If this data type does not exist, create the key.
-                    nokia_data[keyname] = [thisfetch.text]
-            print("start_ymd: {} start_epoch: {}".format(start_ymd, start_epoch))
-            start_time = stop_time + timedelta(days=1)
-            start_ymd = start_time.strftime('%Y-%m-%d')
-            start_epoch = start_time.strftime('%s')
-            print("start_ymd: {} start_epoch: {}".format(start_ymd, start_epoch))
-            print("stop_ymd: {} stop_epoch: {}".format(stop_ymd, stop_epoch))
-            stop_time = stop_time + timedelta(days=8)
-            stop_ymd = stop_time.strftime('%Y-%m-%d')
-            stop_epoch = stop_time.strftime('%s')
-            print("stop_ymd: {} stop_epoch: {}".format(stop_ymd, stop_epoch))
+        print('processing {} - {} for member {}'.format(start_ymd,
+                                                        stop_ymd,
+                                                        oh_member.oh_id))
+        nokia_urls = [
+            {'name': 'activity',
+             'url': 'https://api.health.nokia.com/v2/' +
+                    'measure?action=getactivity&userid=' + str(userid) +
+                    '&startdateymd=' + str(start_ymd) +
+                    '&enddateymd=' + str(stop_ymd)},
+            {'name': 'measure',
+             'url': 'https://api.health.nokia.com' +
+                    '/measure?action=getmeas&userid=' + str(userid) +
+                    '&startdate=' + str(start_epoch) +
+                    '&enddate=' + str(stop_epoch)},
+            {'name': 'intraday',
+             'url': 'https://api.health.nokia.com' +
+                    '/v2/measure?action=getintradayactivity' +
+                    str(userid) + '&startdate=' + str(start_epoch) +
+                    '&enddate=' + str(stop_epoch)},
+            {'name': 'sleep',
+             'url': 'https://api.health.nokia.com/v2/sleep?' +
+                    'action=get&startdate=' + str(start_epoch) +
+                    '&enddate=' + str(stop_epoch) + '&userid=' +
+                    str(userid)},
+            {'name': 'sleep_summary',
+             'url': 'https://api.health.nokia.com' +
+                    '/v2/sleep?action=getsummary&startdateymd=' +
+                    str(start_ymd) + '&enddateymd=' + str(stop_ymd)},
+            {'name': 'workouts',
+             'url': 'https://api.health.nokia.com' +
+                    '/v2/measure?action=getworkouts&userid=' +
+                    str(userid) + '&startdateymd=' + str(start_ymd) +
+                    '&enddateymd=' + str(stop_ymd)}
+        ]
+        for i in range(0, len(nokia_urls)):
+            endpoint = nokia_urls[i]
+            keyname = endpoint['name']
+            print('url for {}'.format(keyname))
+            print(endpoint['url'])
+            thisfetch = rr.get(url=endpoint['url'], auth=queryoauth,
+                               realms=["Nokia"])
+            # print(thisfetch.text)
+            if keyname in nokia_data.keys():
+                print("Adding to existing")
+                # If this data type already exists, append to it.
+                # print(nokia_data[keyname])
+                print(type(nokia_data[keyname]))
+                nokia_data[keyname].append(thisfetch.text)
+            else:
+                print("Creating new endpoint array for {}".format(keyname))
+                # If this data type does not exist, create the key.
+                nokia_data[keyname] = [thisfetch.text]
+        print("start_ymd: {} stop_ymd: {}".format(start_ymd, stop_ymd))
+        start_time = stop_time + timedelta(days=1)
+        start_ymd = start_time.strftime('%Y-%m-%d')
+        start_epoch = start_time.strftime('%s')
+        stop_time = stop_time + timedelta(days=8)
+        stop_ymd = stop_time.strftime('%Y-%m-%d')
+        stop_epoch = stop_time.strftime('%s')
+        print("start_ymd: {} stop_ymd: {}".format(start_ymd, stop_ymd))
 
     except RequestsRespectfulRateLimitedError:
         print('Hit limit requeue request')
