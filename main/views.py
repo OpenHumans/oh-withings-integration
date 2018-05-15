@@ -22,9 +22,60 @@ def index(request):
     """
     Starting page for app.
     """
+    if request.user.is_authenticated:
+        return redirect('/dashboard')
+    else:
+        context = {'client_id': settings.OPENHUMANS_CLIENT_ID,
+                   'oh_proj_page': settings.OH_ACTIVITY_PAGE}
 
-    context = {'client_id': settings.OPENHUMANS_CLIENT_ID,
-               'oh_proj_page': settings.OH_ACTIVITY_PAGE}
+        return render(request, 'main/index.html', context=context)
+
+
+def complete(request):
+    """
+    Receive user from Open Humans and store.
+    """
+    print("Received user returning from Open Humans.")
+
+    # Exchange code for token.
+    # This creates an OpenHumansMember and associated user account.
+    code = request.GET.get('code', '')
+    oh_member = oh_code_to_member(code=code)
+
+    if oh_member:
+        # Log in the user.
+        user = oh_member.user
+        login(request, user,
+              backend='django.contrib.auth.backends.ModelBackend')
+
+        if not hasattr(oh_member, 'nokiahealthmember'):
+            # Create an OAuth1 object, and obtain a request token
+            oauth = OAuth1(settings.NOKIA_CONSUMER_KEY,
+                           client_secret=settings.NOKIA_CONSUMER_SECRET,
+                           callback_uri=settings.NOKIA_CALLBACK_URL)
+            r = requests.post(url=request_token_url, auth=oauth)
+
+            # Parse and save the resource owner key & secret (for use
+            # in nokia_complete callback)
+            credentials = parse_qs(r.text)
+            request.session['resource_owner_key'] =\
+                credentials.get('oauth_token')[0]
+            request.session['resource_owner_secret'] =\
+                credentials.get('oauth_token_secret')[0]
+
+            # Generate the authorization URL
+            authorize_url = authorization_url + '?oauth_token='
+            authorize_url = authorize_url + request.session['resource_owner_key']
+
+            # Render `complete.html`.
+            context = {'oh_id': oh_member.oh_id,
+                       'oh_proj_page': settings.OH_ACTIVITY_PAGE,
+                       "redirect_url": authorize_url,
+                       'nokia_consumer_key': settings.NOKIA_CONSUMER_KEY,
+                       'nokia_callback_url': settings.NOKIA_CALLBACK_URL,
+                       }
+            return render(request, 'main/complete.html', context=context)
+        return redirect("/dashboard")
 
     return render(request, 'main/index.html', context=context)
 
@@ -103,54 +154,6 @@ def nokia_make_member(verifier, resource_owner_key,
         logger.error('Nokia credentials are unavailable')
 
     return None
-
-
-def complete(request):
-    """
-    Receive user from Open Humans and store.
-    """
-    logger.debug("Received user returning from Open Humans.")
-
-    # Exchange code for token.
-    # This creates an OpenHumansMember and associated user account.
-    code = request.GET.get('code', '')
-    oh_member = oh_code_to_member(code=code)
-
-    if oh_member:
-        # Log in the user.
-        user = oh_member.user
-        login(request, user,
-              backend='django.contrib.auth.backends.ModelBackend')
-
-        # Create an OAuth1 object, and obtain a request token
-        oauth = OAuth1(settings.NOKIA_CONSUMER_KEY,
-                       client_secret=settings.NOKIA_CONSUMER_SECRET,
-                       callback_uri=settings.NOKIA_CALLBACK_URL)
-        r = requests.post(url=request_token_url, auth=oauth)
-
-        # Parse and save the resource owner key & secret (for use
-        # in nokia_complete callback)
-        credentials = parse_qs(r.text)
-        request.session['resource_owner_key'] =\
-            credentials.get('oauth_token')[0]
-        request.session['resource_owner_secret'] =\
-            credentials.get('oauth_token_secret')[0]
-
-        # Generate the authorization URL
-        authorize_url = authorization_url + '?oauth_token='
-        authorize_url = authorize_url + request.session['resource_owner_key']
-
-        # Render `complete.html`.
-        context = {'oh_id': oh_member.oh_id,
-                   'oh_proj_page': settings.OH_ACTIVITY_PAGE,
-                   "redirect_url": authorize_url,
-                   'nokia_consumer_key': settings.NOKIA_CONSUMER_KEY,
-                   'nokia_callback_url': settings.NOKIA_CALLBACK_URL,
-                   }
-        return render(request, 'main/complete.html', context=context)
-
-    logger.debug('Invalid code exchange. User returned to starting page.')
-    return redirect('/')
 
 
 def oh_code_to_member(code):
