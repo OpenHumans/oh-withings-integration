@@ -2,46 +2,69 @@
 {% load static %}
 {% block content %}
 
-<div class="container">
-  <h1>Nokia Health (formerly Withings) &rarr; Open Humans</h1>
-  <p class="lead">
-    Use this application to add your Nokia Health data to your
-    <a href="https://www.openhumans.org/">Open Humans</a> account.
-  </p>
-  <p class="lead">
-    Learn more by visiting:<br>
-    <a href="{{ oh_proj_page }}">{{ oh_proj_page }}</a>
-  </p>
-  <h2>How it works</h2>
-  <ol>
-    <li><b>Click the button below</b><br>
-      This takes you to Open Humans.</li>
-    <li><b>Log in or create an Open Humans account</b><br>
-      Data will be added to this account.</li>
-    <li><b>Click to authorize this app in Open Humans</b><br>
-      This allows us to add your Nokia Health data to your Open Humans account.</li>
-    <li><b>Return and click the button to link your Nokia Health account</b><br>
-      Log in using your Nokia Health credentials, and click to return to this app.</li>
-    <li><b>On return here, this app will add your Nokia Health data.</b><br>
-      You'll be able to access &amp; manage data here:
-      <a href="{{ oh_proj_page }}">{{ oh_proj_page }}</a>
-    </li>
-  </ol>
-  {% if client_id %}
-  <a
-    class="btn btn-primary btn-lg"
-    href="https://www.openhumans.org/direct-sharing/projects/oauth2/authorize/?client_id={{ client_id }}&response_type=code"
-    {% else %}
-    class="btn btn-default disabled"
-    {% endif %}
-    >
-    Start with Open Humans authorization
-  </a>
-  {% if not client_id %}
-  <p class="text-muted"><i>
-    This button is disabled because client_id hasn't been configured.
-  </i></p>
-  {% endif %}
+  <div class="container">
+    <h1>Integrate your Nokia Health (formerly Withings) account into <i>Open Humans</i></h1>
+    <p class="lead">
+      This app connects your Nokia Health to your
+      <a href="https://www.openhumans.org/">Open Humans</a> account and
+      makes sure to update your data regularly.
+    </p>
+    <p class="lead">
+      Learn more by visiting our
+      <a href="{{ oh_proj_page }}">page on Open Humans</a>.
+    </p>
+    <div class="row">
+      <div class="col-md-6">
+        <h2>How it works</h2>
+        <ol>
+          <li><b>Click the button below</b><br>
+            This takes you to Open Humans authentification page.</li>
+          <li><b>Log in or create an Open Humans account</b><br>
+            Your Nokia Health data will be added to this account.</li>
+          <li><b>Authorize this app in Open Humans</b><br>
+            This authorizes us to add your Nokia Health data to your account.</li>
+          <li><b>Return and click the button to link your Nokia Health account</b><br>
+              Log in using your Nokia Health credentials, and click to return to this app.</li>
+          <li><b>On return here, this app will add your Nokia Health data.</b><br>
+        </ol>
+        {% if client_id %}
+        <a
+          class="btn btn-primary btn-lg"
+          href="https://www.openhumans.org/direct-sharing/projects/oauth2/authorize/?client_id={{ client_id }}&response_type=code"
+          {% else %}
+          class="btn btn-default disabled"
+          {% endif %}
+          >
+          Start with Open Humans authorization
+        </a>
+        {% if not client_id %}
+        <p class="text-muted"><i>
+          This button is disabled because client_id hasn't been configured.
+        </i></p>
+        {% endif %}
+      </div>
+      <div class='col-md-6'>
+        <h2>FAQ</h2>
+        <ol>
+          <li><b>Will my data from Nokia Health be public?</b><br>
+            <b>The short answer</b>: No, by connecting your Nokia Health account you don't agree
+            to make your data public or give anyone access to this data.
+            It will be stored in your account and you decide with whom to share.<br>
+            <b>The longer answer</b>: It can be public if you want it to be public.
+            If you're logged in into Open Humans <a href='https://www.openhumans.org/public-data/'>
+              can make individual sources publicly available
+            through the public data feature</a>.
+          </li>
+          <li><b>Do you keep my data up to date?</b><br>
+            Yes, we regularly update your data to keep it up to date.
+          After logging in you can also manually trigger an update.</li>
+          <li><b>Who's running this project?</b><br>
+            This project is run by the team of Open Humans itself.</li>
+          <li><b>How can I get in touch with you?</b><br>
+            You can reach us via email at support@openhumans.org
+          </li>
+        </ol>
+      </div>
+    </div>
 </div>
-
 {% endblock %}

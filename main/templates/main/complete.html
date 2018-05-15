@@ -2,35 +2,23 @@
 {% load static %}
 {% block content %}
 
-<div class="container">
-  <h1>One last step.</h1>
-  <p class="lead">
-    Thank you! We have your authorization from Open Humans.
-  </p>
-  <p>
-    Click the button below to begin authorization with Nokia Health.
-  </p>
-  <p>
-      {% if nokia_consumer_key %}
+  <div class="container">
+    <h1>One last step.</h1>
+    <p class="lead">
+      Thank you! We have your authorization from Open Humans.
+    </p>
+    <p>
       <a
         class="btn btn-primary btn-lg"
-
-        href="{{redirect_url}}"
-
-        {% else %}
-
-        class="btn btn-default disabled"
-
-        {% endif %}
+        href="{{nokia_url}}"
         >
-        Start with Nokia Health authorization
+        Login into Nokia
       </a>
-
-      {% if not nokia_consumer_key %}
-      <p class="text-muted"><i>
-        This button is disabled because nokia_consumer_key hasn't been configured.
-      </i></p>
-      {% endif %}
-</div>
+    </p>
+    <p>
+      Check this out here:
+      <a href="{{ oh_proj_page }}">{{ oh_proj_page }}</a>
+    </p>
+  </div>
 
 {% endblock %}
