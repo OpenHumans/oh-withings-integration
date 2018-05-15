@@ -239,9 +239,11 @@ def get_start_time(oh_access_token, nokia_data):
 
 def get_start_time_no_existing(userid, queryoauth):
     # Fetch activity data with no date given.
-    fetch = rr.get(url='https://api.health.nokia.com/v2/' +
-                       'measure?action=getactivity&userid=' +
-                       str(userid), auth=queryoauth, realms=["Nokia"])
+    start_ymd = "2009-01-01"
+    stop_time = datetime.utcnow()
+    stop_ymd = stop_time.strftime('%Y-%m-%d')
+    url = 'https://api.health.nokia.com/v2/measure?action=getactivity&userid=' + str(userid) + '&startdateymd=' + str(start_ymd) + '&enddateymd=' + str(stop_ymd)
+    fetch = rr.get(url=url, auth=queryoauth, realms=["Nokia"])
     activity_data = fetch.text
     print("activity data: {}".format(activity_data))
     try:
