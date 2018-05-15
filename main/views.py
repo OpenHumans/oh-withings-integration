@@ -1,14 +1,19 @@
 import logging
 import requests
 
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 from django.shortcuts import render, redirect
 from django.conf import settings
 from datauploader.tasks import process_nokia
+from django.contrib import messages
 from requests_oauthlib import OAuth1
 from urllib.parse import parse_qs
 from open_humans.models import OpenHumansMember
+from .helpers import get_nokia_file, check_update
 from .models import NokiaHealthMember
+from ohapi import api
+import arrow
+
 
 # Set up logging.
 logger = logging.getLogger(__name__)
