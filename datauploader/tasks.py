@@ -224,9 +224,23 @@ def get_start_time(oh_access_token, nokia_data, queryoauth, oauth_token):
                 print("setting start date {} from existing measure data".format(date_parsed))
                 return date_parsed
             except:
-                # If we can't get a date from activity or measure endpoints,
-                # don't return a date.
-                return None
-    else:
-        # If there is no existing data, don't return a date.
-        return None
+                print("Couldn't get date from measure... using member since")
+
+
+    infourl = 'https://api.health.nokia.com/user?action=getinfo&access_token=' + str(oauth_token)
+    userinfo = rr.get(url=infourl, auth=queryoauth, realms=["Nokia"])
+    userinfo = userinfo.text
+    userinfo = ast.literal_eval(userinfo)
+    print("userinfo: {}".format(userinfo))
+    userinfobody = userinfo["body"]
+    print("userinfobody: {}".format(userinfobody))
+    userinfobodyuser = userinfobody["user"]
+    print("userinfobodyuser: {}".format(userinfobodyuser))
+    member_since = userinfobodyuser["created"]
+    print("member_since: {}".format(member_since))
+    member_since_struct = time.localtime(member_since)
+    print("member_since_struct: {}".format(member_since_struct))
+    member_since_parsed = datetime(*member_since_struct[:3])
+    print("member_since_parsed: {}".format(member_since_parsed))
+
+    return member_since_parsed
