@@ -188,12 +188,14 @@ def get_existing_nokia(oh_access_token):
     return {}
 
 
-def get_start_time(oh_access_token, nokia_data):
+def get_start_time(oh_access_token, nokia_data, queryoauth, oauth_token):
     """
     Look at existing nokia data and find out the last date it was fetched
     for. Start by looking at activity and then measure endpoints.
     """
+
     if nokia_data != {}:
+        # If there is existing data, start from the most recent date.
         try:
             # If there is activity data, check whether it has a date
             activity_data = nokia_data["activity"][-1]
