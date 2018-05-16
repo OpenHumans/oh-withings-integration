@@ -149,7 +149,7 @@ def replace_nokia(oh_member, nokia_data):
     """
     tmp_directory = tempfile.mkdtemp()
     metadata = {
-        'tags': ['nokia2', 'health', 'measure'],
+        'tags': ['nokia', 'health', 'measure'],
         'description': 'File with Nokia Health data',
         'updated_at': str(datetime.utcnow()),
     }
@@ -172,7 +172,7 @@ def get_existing_nokia(oh_access_token):
     print("Entering get_existing_nokia function...")
     member = api.exchange_oauth2_member(oh_access_token)
     for dfile in member['data']:
-        if 'nokia2' in dfile['metadata']['tags']:
+        if 'nokia' in dfile['metadata']['tags']:
             print("Found file with tag...")
             # get file here and read the json into memory
             tf_in = tempfile.NamedTemporaryFile(suffix='.json')
