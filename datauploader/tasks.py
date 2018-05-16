@@ -206,8 +206,7 @@ def get_start_time(oh_access_token, nokia_data, queryoauth, oauth_token):
             date_ymd = activity_data["body"]["activities"][-1]["date"]
             date_parsed = dp.parse(date_ymd)
 
-            print("Start date:")
-            print(date_parsed)
+            print("setting start date {} from existing activity data".format(date_parsed))
             return date_parsed
         except:
             print("Couldn't get date from activity... trying with measure")
@@ -217,11 +216,12 @@ def get_start_time(oh_access_token, nokia_data, queryoauth, oauth_token):
                 measure_data = measure_data.replace("true", "True")
                 measure_data = measure_data.replace("false", "False")
                 measure_data = ast.literal_eval(measure_data)
+
                 date_epoch = measure_data["body"]["updatetime"]
                 date_struct = time.localtime(date_epoch)
                 date_parsed = datetime.datetime(*date_struct[:3])
-                print(date_ymd)
-                print(date_parsed)
+
+                print("setting start date {} from existing measure data".format(date_parsed))
                 return date_parsed
             except:
                 # If we can't get a date from activity or measure endpoints,
