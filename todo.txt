@@ -20,18 +20,25 @@
     - [x] step through with that one
     - [x] make sure data upload of empty dict is in correct format
     - [x] make sure get_start_time goes for the 2009 date
-    - [ ] make different case for empty data
-- [ ] fix problem with updating on start/end time
-  - [ ] do just activity call with no date and get date from that
+    - [x] make different case for empty data
+- [x] fix problem with updating on start/end time
+  - [x] do just activity call with no date and get date from that
   - [x] make start date actually change in the while loop
   - [x] get rid of end times when they are optional
-  - [ ] find a solution for coding the endpoints which require end
-- [ ] add remove_partial function
+  - [x] find a solution for coding the endpoints which require end
+- [x] add remove_partial function
+
+- [ ] use new userinfo endpoint to set start date for first fetch
+- [ ] manually set start and end point and fetch data then do a merge to check the seam
+
+
+- [ ] one day at a time for intraday
+- [ ] 200 days at a time for sleep summary
 
 
 # Improve UI
 
-- [ ] implement dashboard view as in moves/fitbit
+- [x] implement dashboard view as in moves/fitbit
 - [ ] tidy up generally and check/improve messages to user
 
 # Next steps
