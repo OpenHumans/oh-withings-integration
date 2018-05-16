@@ -28,7 +28,7 @@
   - [x] find a solution for coding the endpoints which require end
 - [x] add remove_partial function
 
-- [ ] use new userinfo endpoint to set start date for first fetch
+- [x] use new userinfo endpoint to set start date for first fetch
 - [ ] manually set start and end point and fetch data then do a merge to check the seam
 
 
