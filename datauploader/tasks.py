@@ -62,21 +62,14 @@ def update_nokia(oh_member, userid, queryoauth, nokia_data, oauth_token):
                             client_secret=settings.OPENHUMANS_CLIENT_SECRET)
     try:
         # Set start date and end date for data fetch
-        start_time = get_start_time(oh_access_token, nokia_data)
-        if not start_time:
-            start_ymd = '2009-01-01'
-            start_time = dp.parse(start_ymd)
-        else:
-            start_ymd = start_time.strftime('%Y-%m-%d')
+        start_time = get_start_time(oh_access_token, nokia_data, queryoauth,
+                                    oauth_token)
+        start_ymd = start_time.strftime('%Y-%m-%d')
 
         start_epoch = start_time.strftime('%s')
         stop_time = datetime.utcnow() + timedelta(days=7)
         stop_ymd = stop_time.strftime('%Y-%m-%d')
         stop_epoch = stop_time.strftime('%s')
-
-        infourl = 'https://api.health.nokia.com/user?action=getinfo&access_token=' + str(oauth_token)
-        userinfo = rr.get(url=infourl, auth=queryoauth, realms=["Nokia"])
-        print(userinfo.text)
 
         print('processing {} - {} for member {}'.format(start_ymd,
                                                         stop_ymd,
