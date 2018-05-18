@@ -118,11 +118,11 @@ def update_nokia(oh_member, userid, queryoauth, nokia_data, oauth_token):
                 # If this data type already exists, append to it.
                 # print(nokia_data[keyname])
                 print(type(nokia_data[keyname]))
-                nokia_data[keyname].append(thisfetch.text)
+                nokia_data[keyname].append(thisfetch.json())
             else:
                 print("Creating new endpoint array for {}".format(keyname))
                 # If this data type does not exist, create the key.
-                nokia_data[keyname] = [thisfetch.text]
+                nokia_data[keyname] = [thisfetch.json()]
         print("start_ymd: {} stop_ymd: {}".format(start_ymd, stop_ymd))
         start_time = stop_time + timedelta(days=1)
         start_ymd = start_time.strftime('%Y-%m-%d')
@@ -153,7 +153,7 @@ def replace_nokia(oh_member, nokia_data):
         'description': 'File with Nokia Health data',
         'updated_at': str(datetime.utcnow()),
     }
-    filename = 'nokia_data_' + datetime.today().strftime('%Y%m%d')
+    filename = 'nokia_data_' + datetime.today().strftime('%Y%m%d') + '.json'
     out_file = os.path.join(tmp_directory, filename)
     logger.debug('deleted old file for {}'.format(oh_member.oh_id))
     api.delete_file(oh_member.access_token,
@@ -179,10 +179,11 @@ def get_existing_nokia(oh_access_token):
             tf_in.write(requests.get(dfile['download_url']).content)
             tf_in.flush()
             nokia_data = json.load(open(tf_in.name))
-            print("getting existing data:")
-            print(type(nokia_data))
-            for key in nokia_data:
-                print(key)
+            # print("getting existing data:")
+            # print(nokia_data)
+            # print(type(nokia_data))
+            # for key in nokia_data:
+            #     print(key)
             return nokia_data
     print('no existing data with nokia tag')
     return {}
