@@ -1,7 +1,52 @@
+# Data fetch / upload steps
+
+- [x] check get existing is working
+  - [x] look at file downloaded from activity page
+  - [x] compare this with print of get existing in next step-through
+- [x] check get_start_time is working
+  - [x] look at first date in existing data
+  - [x] check this matches with a print of start_time
+- [x] check data merge is going ok
+  - [x] look at merged object and check there are no seams between new/existing
+- [x] test edge cases (no existing data/first fetch)
+  - [x] first fetch:
+    - [x] change data tag to make it seem like no existing data
+    - [x] then check data uploads ok
+    - [x] make sure get existing doesn't get anything
+    - [x] make sure get_start_time gets the 2009 date
+    - [x] check data is in correct format
+  - [x] empty data:
+    - [x] make new nokia account with no data in
+    - [x] step through with that one
+    - [x] make sure data upload of empty dict is in correct format
+    - [x] make sure get_start_time goes for the 2009 date
+    - [x] make different case for empty data
+- [x] fix problem with updating on start/end time
+  - [x] do just activity call with no date and get date from that
+  - [x] make start date actually change in the while loop
+  - [x] get rid of end times when they are optional
+  - [x] find a solution for coding the endpoints which require end
+- [x] add remove_partial function
+
+- [x] use new userinfo endpoint to set start date for first fetch
+- [ ] manually set start and end point and fetch data then do a merge to check the seam
+
+
+- [ ] one day at a time for intraday
+- [ ] 200 days at a time for sleep summary
+
+
+# Improve UI
+
+- [x] implement dashboard view as in moves/fitbit
+- [ ] tidy up generally and check/improve messages to user
+
+# Next steps
+
 - [ ] add Celery beat timed task?
 - [ ] trigger data update for each user
 - [ ] fix rate limiting workflow
 - [ ] per user realms for rr?
 - [x] move data fetch to Celery (out of `views.py`)
 - [x] more requests-respectful setup to `settings.py`
-- [ ] find out why build is failing 
+- [x] find out why build is failing

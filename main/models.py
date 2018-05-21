@@ -1,6 +1,7 @@
 from django.db import models
 from open_humans.models import OpenHumansMember
-
+import arrow
+from datetime import timedelta
 
 class NokiaHealthMember(models.Model):
     """
@@ -12,3 +13,8 @@ class NokiaHealthMember(models.Model):
     deviceid = models.CharField(max_length=16)
     oauth_token = models.CharField(max_length=256)
     oauth_token_secret = models.CharField(max_length=256)
+    last_updated = models.DateTimeField(
+                            default=(arrow.now() - timedelta(days=7)).format())
+    last_submitted = models.DateTimeField(
+                            default=(arrow.now() - timedelta(days=7)).format())
+

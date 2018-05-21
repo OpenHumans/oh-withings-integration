@@ -7,7 +7,7 @@
     <p class="lead">
       You can perform basic management tasks from this page.
     </p>
-    {% if nokia_member%}
+    {% if nokia_member %}
     <div class="row">
       <div class="col-md-6">
         <p>
@@ -16,7 +16,7 @@
         update of your Nokia Health data (automatic data updates are done every few days,
         but you might want to have your latest data right now).
         </p>
-        {% if allow_update%}
+        {% if allow_update %}
         <form action="{% url 'update_data' %}" method="post">
           {% csrf_token %}
           <input type="submit"
