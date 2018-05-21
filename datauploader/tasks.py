@@ -119,11 +119,22 @@ def update_nokia(oh_member, userid, queryoauth, nokia_data, oauth_token):
                 # print(nokia_data[keyname])
                 print(type(nokia_data[keyname]))
 
-                existing_entries = nokia_data[keyname]["body"]["activities"]
-                new_entries = thisfetch.json()["body"]["activities"]
-                merged = existing_entries + new_entries
-
-                nokia_data[keyname]["body"]["activities"] = merged
+                if keyname == "activity":
+                    existing_entries = nokia_data[keyname]["body"]["activities"]
+                    new_entries = thisfetch.json()["body"]["activities"]
+                    merged = existing_entries + new_entries
+                    nokia_data[keyname]["body"]["activities"] = merged
+                elif keyname == "measure":
+                    existing_entries = nokia_data[keyname]["body"]["measuregrps"]
+                    new_entries = thisfetch.json()["body"]["measuregrps"]
+                    merged = existing_entries + new_entries
+                    nokia_data[keyname]["body"]["measuregrps"] = merged
+                elif keyname == "sleep" or keyname == "sleep_summary" or keyname == "workouts":
+                    existing_entries = nokia_data[keyname]["body"]["series"]
+                    new_entries = thisfetch.json()["body"]["series"]
+                    merged = existing_entries + new_entries
+                    nokia_data[keyname]["body"]["series"] = merged
+                # intraday case not implemented yet
             else:
                 print("Creating new endpoint array for {}".format(keyname))
                 # If this data type does not exist, create the key.
