@@ -196,16 +196,17 @@ def get_start_time(oh_access_token, nokia_data, queryoauth, oauth_token):
     """
 
     if nokia_data != {}:
+        print("detected existing nokia data")
         # If there is existing data, start from the most recent date.
         try:
             # If there is activity data, check whether it has a date
             activity_data = nokia_data["activity"][-1]
-            activity_data = activity_data.replace("true", "True")
-            activity_data = activity_data.replace("false", "False")
-            activity_data = ast.literal_eval(activity_data)
+            print("found activity data")
 
             date_ymd = activity_data["body"]["activities"][-1]["date"]
+            print("found activity date")
             date_parsed = dp.parse(date_ymd)
+            print("parsed date")
 
             print("setting start date {} from existing activity data".format(date_parsed))
             return date_parsed
@@ -214,9 +215,6 @@ def get_start_time(oh_access_token, nokia_data, queryoauth, oauth_token):
             try:
                 # If there is measure data, check whether it has a date
                 measure_data = nokia_data["measure"][-1]
-                measure_data = measure_data.replace("true", "True")
-                measure_data = measure_data.replace("false", "False")
-                measure_data = ast.literal_eval(measure_data)
 
                 date_epoch = measure_data["body"]["updatetime"]
                 date_struct = time.localtime(date_epoch)
