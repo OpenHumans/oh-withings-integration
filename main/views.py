@@ -174,7 +174,7 @@ def complete_nokia(request):
 
     if nokia_member:
         # Fetch user's data from Nokia (update the data if it already existed)
-        # process_nokia(oh_id)
+        process_nokia.delay(oh_id)
         context = {'tokeninfo': 'Fetching data...',
                    'oh_proj_page': settings.OH_ACTIVITY_PAGE}
         return render(request, 'main/complete_nokia.html', context=context)
