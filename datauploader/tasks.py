@@ -118,11 +118,16 @@ def update_nokia(oh_member, userid, queryoauth, nokia_data, oauth_token):
                 # If this data type already exists, append to it.
                 # print(nokia_data[keyname])
                 print(type(nokia_data[keyname]))
-                nokia_data[keyname].append(thisfetch.json())
+
+                existing_entries = nokia_data[keyname]["body"]["activities"]
+                new_entries = thisfetch.json()["body"]["activities"]
+                merged = existing_entries + new_entries
+
+                nokia_data[keyname]["body"]["activities"] = merged
             else:
                 print("Creating new endpoint array for {}".format(keyname))
                 # If this data type does not exist, create the key.
-                nokia_data[keyname] = [thisfetch.json()]
+                nokia_data[keyname] = thisfetch.json()
         print("start_ymd: {} stop_ymd: {}".format(start_ymd, stop_ymd))
         start_time = stop_time + timedelta(days=1)
         start_ymd = start_time.strftime('%Y-%m-%d')
@@ -200,7 +205,7 @@ def get_start_time(oh_access_token, nokia_data, queryoauth, oauth_token):
         # If there is existing data, start from the most recent date.
         try:
             # If there is activity data, check whether it has a date
-            activity_data = nokia_data["activity"][-1]
+            activity_data = nokia_data["activity"]
             print("found activity data")
 
             date_ymd = activity_data["body"]["activities"][-1]["date"]
@@ -214,7 +219,7 @@ def get_start_time(oh_access_token, nokia_data, queryoauth, oauth_token):
             print("Couldn't get date from activity... trying with measure")
             try:
                 # If there is measure data, check whether it has a date
-                measure_data = nokia_data["measure"][-1]
+                measure_data = nokia_data["measure"]
 
                 date_epoch = measure_data["body"]["updatetime"]
                 date_struct = time.localtime(date_epoch)
