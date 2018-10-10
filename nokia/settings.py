@@ -75,7 +75,7 @@ if REMOTE is True:
 
 # Requests Respectful (rate limiting, waiting)
 rr = RespectfulRequester()
-rr.register_realm("Nokia", max_requests=3600, timespan=3600)
+rr.register_realm("Nokia", max_requests=120, timespan=60)
 
 if REMOTE:
     NOKIA_CALLBACK_URL = 'http://oh-nokiahealth-integration.herokuapp.com/complete_nokia'

@@ -52,7 +52,7 @@ def complete(request):
         user = oh_member.user
         login(request, user,
               backend='django.contrib.auth.backends.ModelBackend')
-        
+
         context = {'oh_id': oh_member.oh_id,
                    'oh_proj_page': settings.OH_ACTIVITY_PAGE}
 
@@ -179,53 +179,6 @@ def complete_nokia(request):
 
     logger.debug('Could not create Withings/Nokia member.')
     return redirect('/dashboard')
-
-
-def nokia_make_member(verifier, resource_owner_key,
-                      resource_owner_secret, oh_user):
-
-    if settings.NOKIA_CLIENT_ID and settings.NOKIA_CONSUMER_SECRET and \
-       verifier and resource_owner_key and resource_owner_secret:
-        # Create a new OAuth1 object using the resource owner key/secret
-        # from session data and using the verifier parsed from the URL (above)
-        oauth = OAuth1(settings.NOKIA_CLIENT_ID,
-                       client_secret=settings.NOKIA_CONSUMER_SECRET,
-                       resource_owner_key=resource_owner_key,
-                       resource_owner_secret=resource_owner_secret,
-                       verifier=verifier)
-
-        access_token_url =\
-            'https://account.withings.com/oauth2/token'
-        # Make a request to Nokia (final request) for an access token
-        r = requests.post(url=access_token_url, auth=oauth)
-        credentials = parse_qs(r.text)
-
-        # Make member model
-        oauth_token = credentials.get('oauth_token')[0]
-        oauth_token_secret = credentials.get('oauth_token_secret')[0]
-        userid = credentials.get('userid')[0]
-        deviceid = credentials.get('deviceid')[0]
-
-        try:
-            nokia_member = NokiaHealthMember.objects.get(userid=userid)
-            nokia_member.deviceid = deviceid
-            nokia_member.oauth_token = oauth_token
-            nokia_member.oauth_token_secret = oauth_token_secret
-            nokia_member.save()
-        except NokiaHealthMember.DoesNotExist:
-            nokia_member, created = NokiaHealthMember.objects.get_or_create(
-                user=oh_user,
-                userid=userid,
-                deviceid=deviceid,
-                oauth_token=oauth_token,
-                oauth_token_secret=oauth_token_secret)
-
-        return nokia_member
-
-    else:
-        logger.error('Nokia credentials are unavailable')
-
-    return None
 
 
 def oh_code_to_member(code):
