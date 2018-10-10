@@ -45,7 +45,7 @@ def process_nokia(oh_id):
     userid = nokia_member.userid
     nokia_access_token = nokia_member.access_token
 
-    update_nokia.delay(oh_member, userid, nokia_data, nokia_access_token)
+    update_nokia(oh_member, userid, nokia_data, nokia_access_token)
 
 
 def update_nokia(oh_member, userid, nokia_data, access_token):
@@ -237,7 +237,6 @@ def get_start_time(oh_access_token, nokia_data, access_token):
                 return date_parsed
             except:
                 print("Couldn't get date from measure... using member since")
-
 
     infourl = 'https://wbsapi.withings.net/user?action=getinfo&access_token=' + str(access_token)
     userinfo = rr.get(url=infourl, realms=["Nokia"])

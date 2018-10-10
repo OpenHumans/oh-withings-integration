@@ -1,9 +1,5 @@
 from django.core.management.base import BaseCommand
 from main.models import NokiaHealthMember
-from main.views import process_nokia
-import arrow
-from datetime import timedelta
-
 
 class Command(BaseCommand):
     help = 'Migrate users from OAuth1 to OAuth2'
