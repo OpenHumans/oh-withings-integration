@@ -56,6 +56,7 @@ OH_DELETE_FILES = OH_API_BASE + '/project/files/delete/'
 NOKIA_USER_PAGE = os.getenv('NOKIA_USER_PAGE')
 NOKIA_CLIENT_ID = os.getenv('NOKIA_CLIENT_ID')
 NOKIA_CONSUMER_SECRET = os.getenv('NOKIA_CONSUMER_SECRET')
+WITHINGS_REDIRECT_URI = os.getenv('WITHINGS_REDIRECT_URI')
 
 if REMOTE is True:
     from urllib.parse import urlparse

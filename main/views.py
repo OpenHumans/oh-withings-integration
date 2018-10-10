@@ -57,7 +57,7 @@ def complete(request):
                    'oh_proj_page': settings.OH_ACTIVITY_PAGE}
 
         if not hasattr(oh_member, 'nokia_member'):
-            auth_url = 'https://account.withings.com/oauth2_user/authorize2?response_type=code&client_id='+settings.NOKIA_CLIENT_ID+'&scope=user.info,user.metrics,user.activity'
+            auth_url = 'https://account.withings.com/oauth2_user/authorize2?response_type=code&client_id='+settings.NOKIA_CLIENT_ID+'&scope=user.info,user.metrics,user.activity&redirect_uri='+str(settings.WITHINGS_REDIRECT_URI)+'&state=abc'
             context['auth_url'] = auth_url
             return render(request, 'main/complete.html', context=context)
 
@@ -82,8 +82,8 @@ def dashboard(request):
             nokia_member = ''
             download_file = ''
 
-            # Generate the authorization URL
-            auth_url = 'https://account.withings.com/oauth2_user/authorize2?response_type=code&client_id='+settings.NOKIA_CLIENT_ID+'&scope=user.info,user.metrics,user.activity'
+        # Generate the authorization URL
+        auth_url = 'https://account.withings.com/oauth2_user/authorize2?response_type=code&client_id='+settings.NOKIA_CLIENT_ID+'&scope=user.info,user.metrics,user.activity&redirect_uri='+str(settings.WITHINGS_REDIRECT_URI)+'&state=abc'
 
         context = {
             'oh_member': request.user.oh_member,
@@ -139,28 +139,36 @@ def complete_nokia(request):
     logger.debug("Received user returning from Withings/Nokia Health")
 
     code = request.GET['code']
+    print(code)
 
     oh_id = request.user.oh_member.oh_id
     print(oh_id)
     oh_user = OpenHumansMember.objects.get(oh_id=oh_id)
 
-    payload = {'code': code, 'grant_type': 'authorization_code', 'client_id': settings.NOKIA_CLIENT_ID, 'client_secret': settings.NOKIA_CONSUMER_SECRET}
+    payload = {'code': code, 'grant_type': 'authorization_code', 'client_id': settings.NOKIA_CLIENT_ID, 'client_secret': settings.NOKIA_CONSUMER_SECRET, 'redirect_uri': 'http://127.0.0.1:5000/complete_nokia', 'state': 'abc'}
     r = requests.post('https://account.withings.com/oauth2/token', payload)
+    rjson = r.json()
+    print(rjson)
 
     # Save the user 
     try:
-        nokia_member = NokiaHealthMember.objects.get(userid=userid)
-        nokia_member.deviceid = deviceid
-        nokia_member.oauth_token = oauth_token
-        nokia_member.oauth_token_secret = oauth_token_secret
+        nokia_member = NokiaHealthMember.objects.get(userid=rjson['userid'])
+        nokia_member.userid = rjson['userid']
+        nokia_member.access_token = rjson['access_token']
+        nokia_member.refresh_token = rjson['refresh_token']
+        nokia_member.expires_in = rjson['expires_in']
+        nokia_member.scope = rjson['scope']
+        nokia_member.token_type = rjson['token_type']
         nokia_member.save()
     except NokiaHealthMember.DoesNotExist:
         nokia_member, created = NokiaHealthMember.objects.get_or_create(
             user=oh_user,
-            userid=userid,
-            deviceid=deviceid,
-            oauth_token=oauth_token,
-            oauth_token_secret=oauth_token_secret)
+            userid=rjson['userid'],
+            access_token=rjson['access_token'],
+            refresh_token=rjson['refresh_token'],
+            expires_in=rjson['expires_in'],
+            scope=rjson['scope'],
+            token_type=rjson['token_type'])
 
     if nokia_member:
         # Fetch user's data from Nokia (update the data if it already existed)
