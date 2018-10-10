@@ -54,7 +54,7 @@ OH_DELETE_FILES = OH_API_BASE + '/project/files/delete/'
 
 # Nokia Health configuration
 NOKIA_USER_PAGE = os.getenv('NOKIA_USER_PAGE')
-NOKIA_CONSUMER_KEY = os.getenv('NOKIA_CONSUMER_KEY')
+NOKIA_CLIENT_ID = os.getenv('NOKIA_CLIENT_ID')
 NOKIA_CONSUMER_SECRET = os.getenv('NOKIA_CONSUMER_SECRET')
 
 if REMOTE is True:
