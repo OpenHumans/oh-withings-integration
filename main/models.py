@@ -48,7 +48,7 @@ class NokiaHealthMember(models.Model):
         Refresh access token.
         """
         print("calling refresh token method in class")
-        response=requests.get(
+        response = requests.get(
             'https://account.withings.com/oauth2/token',
             data = {
                 'grant_type': 'refresh_token',
