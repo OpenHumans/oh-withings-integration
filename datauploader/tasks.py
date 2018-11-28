@@ -43,27 +43,19 @@ def process_nokia(oh_id):
     nokia_data = get_existing_nokia(oh_access_token)
     nokia_member = oh_member.nokia_member
     userid = nokia_member.userid
-    oauth_token = nokia_member.oauth_token
-    oauth_token_secret = nokia_member.oauth_token_secret
-    print(userid)
-    queryoauth = OAuth1(client_key=settings.NOKIA_CONSUMER_KEY,
-                        client_secret=settings.NOKIA_CONSUMER_SECRET,
-                        resource_owner_key=oauth_token,
-                        resource_owner_secret=oauth_token_secret,
-                        signature_type='query')
+    nokia_access_token = nokia_member.access_token
 
-    print('Calling update_nokia function')
-    update_nokia(oh_member, userid, queryoauth, nokia_data, oauth_token)
+    update_nokia(oh_member, userid, nokia_data, nokia_access_token)
 
 
-def update_nokia(oh_member, userid, queryoauth, nokia_data, oauth_token):
+def update_nokia(oh_member, userid, nokia_data, access_token):
     oh_access_token = oh_member.get_access_token(
                             client_id=settings.OPENHUMANS_CLIENT_ID,
                             client_secret=settings.OPENHUMANS_CLIENT_SECRET)
+
     try:
         # Set start date and end date for data fetch
-        start_time = get_start_time(oh_access_token, nokia_data, queryoauth,
-                                    oauth_token)
+        start_time = get_start_time(oh_access_token, nokia_data, access_token)
         start_ymd = start_time.strftime('%Y-%m-%d')
 
         start_epoch = start_time.strftime('%s')
@@ -76,42 +68,47 @@ def update_nokia(oh_member, userid, queryoauth, nokia_data, oauth_token):
                                                         oh_member.oh_id))
         nokia_urls = [
             {'name': 'activity',
-             'url': 'https://api.health.nokia.com/v2/' +
+             'url': 'https://wbsapi.withings.net/v2/' +
                     'measure?action=getactivity&userid=' + str(userid) +
                     '&startdateymd=' + str(start_ymd) +
-                    '&enddateymd=' + str(stop_ymd)},
+                    '&enddateymd=' + str(stop_ymd) +
+                    '&access_token=' + str(access_token)},
             {'name': 'measure',
-             'url': 'https://api.health.nokia.com' +
+             'url': 'https://wbsapi.withings.net' +
                     '/measure?action=getmeas&userid=' + str(userid) +
                     '&startdate=' + str(start_epoch) +
-                    '&enddate=' + str(stop_epoch)},
+                    '&enddate=' + str(stop_epoch) +
+                    '&access_token=' + str(access_token)},
             {'name': 'intraday',
-             'url': 'https://api.health.nokia.com' +
+             'url': 'https://wbsapi.withings.net' +
                     '/v2/measure?action=getintradayactivity' +
                     str(userid) + '&startdate=' + str(start_epoch) +
-                    '&enddate=' + str(stop_epoch)},
+                    '&enddate=' + str(stop_epoch) +
+                    '&access_token=' + str(access_token)},
             {'name': 'sleep',
-             'url': 'https://api.health.nokia.com/v2/sleep?' +
+             'url': 'https://wbsapi.withings.net/v2/sleep?' +
                     'action=get&startdate=' + str(start_epoch) +
                     '&enddate=' + str(stop_epoch) + '&userid=' +
-                    str(userid)},
+                    str(userid) +
+                    '&access_token=' + str(access_token)},
             {'name': 'sleep_summary',
-             'url': 'https://api.health.nokia.com' +
+             'url': 'https://wbsapi.withings.net' +
                     '/v2/sleep?action=getsummary&startdateymd=' +
-                    str(start_ymd) + '&enddateymd=' + str(stop_ymd)},
+                    str(start_ymd) + '&enddateymd=' + str(stop_ymd) +
+                    '&access_token=' + str(access_token)},
             {'name': 'workouts',
-             'url': 'https://api.health.nokia.com' +
+             'url': 'https://wbsapi.withings.net' +
                     '/v2/measure?action=getworkouts&userid=' +
                     str(userid) + '&startdateymd=' + str(start_ymd) +
-                    '&enddateymd=' + str(stop_ymd)}
+                    '&enddateymd=' + str(stop_ymd) +
+                    '&access_token=' + str(access_token)}
         ]
         for i in range(0, len(nokia_urls)):
             endpoint = nokia_urls[i]
             keyname = endpoint['name']
             print('url for {}'.format(keyname))
             print(endpoint['url'])
-            thisfetch = rr.get(url=endpoint['url'], auth=queryoauth,
-                               realms=["Nokia"])
+            thisfetch = rr.get(url=endpoint['url'], realms=["Nokia"])
             # print(thisfetch.text)
             if keyname in nokia_data.keys():
                 print("Adding to existing")
@@ -134,7 +131,7 @@ def update_nokia(oh_member, userid, queryoauth, nokia_data, oauth_token):
                     new_entries = thisfetch.json()["body"]["series"]
                     merged = existing_entries + new_entries
                     nokia_data[keyname]["body"]["series"] = merged
-                # intraday case not implemented yet
+                    # intraday case not implemented yet
             else:
                 print("Creating new endpoint array for {}".format(keyname))
                 # If this data type does not exist, create the key.
@@ -205,7 +202,7 @@ def get_existing_nokia(oh_access_token):
     return {}
 
 
-def get_start_time(oh_access_token, nokia_data, queryoauth, oauth_token):
+def get_start_time(oh_access_token, nokia_data, access_token):
     """
     Look at existing nokia data and find out the last date it was fetched
     for. Start by looking at activity and then measure endpoints.
@@ -241,9 +238,8 @@ def get_start_time(oh_access_token, nokia_data, queryoauth, oauth_token):
             except:
                 print("Couldn't get date from measure... using member since")
 
-
-    infourl = 'https://api.health.nokia.com/user?action=getinfo&access_token=' + str(oauth_token)
-    userinfo = rr.get(url=infourl, auth=queryoauth, realms=["Nokia"])
+    infourl = 'https://wbsapi.withings.net/user?action=getinfo&access_token=' + str(access_token)
+    userinfo = rr.get(url=infourl, realms=["Nokia"])
     userinfo = userinfo.text
     userinfo = ast.literal_eval(userinfo)
     print("userinfo: {}".format(userinfo))

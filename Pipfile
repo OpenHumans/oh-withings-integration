@@ -23,6 +23,7 @@ whitenoise = "*"
 
 [dev-packages]
 pylint = "*"
+pylint-django = "*"
 "flake8" = "*"
 
 [requires]

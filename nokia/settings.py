@@ -32,6 +32,11 @@ REMOTE = True if os.getenv('REMOTE', '').lower() == 'true' else False
 
 ALLOWED_HOSTS = ['*']
 
+# Check if running on Heroku. If so, force SSL.
+ON_HEROKU = os.getenv('ON_HEROKU', 'false').lower() == 'true'
+if ON_HEROKU:
+    SECURE_SSL_REDIRECT = True
+
 HEROKUCONFIG_APP_NAME = os.getenv('HEROKUCONFIG_APP_NAME', '')
 
 DEFAULT_BASE_URL = ('https://{}.herokuapp.com'.format(HEROKUCONFIG_APP_NAME) if
@@ -54,8 +59,9 @@ OH_DELETE_FILES = OH_API_BASE + '/project/files/delete/'
 
 # Nokia Health configuration
 NOKIA_USER_PAGE = os.getenv('NOKIA_USER_PAGE')
-NOKIA_CONSUMER_KEY = os.getenv('NOKIA_CONSUMER_KEY')
+NOKIA_CLIENT_ID = os.getenv('NOKIA_CLIENT_ID')
 NOKIA_CONSUMER_SECRET = os.getenv('NOKIA_CONSUMER_SECRET')
+WITHINGS_REDIRECT_URI = os.getenv('WITHINGS_REDIRECT_URI')
 
 if REMOTE is True:
     from urllib.parse import urlparse
@@ -74,7 +80,7 @@ if REMOTE is True:
 
 # Requests Respectful (rate limiting, waiting)
 rr = RespectfulRequester()
-rr.register_realm("Nokia", max_requests=3600, timespan=3600)
+rr.register_realm("Nokia", max_requests=120, timespan=60)
 
 if REMOTE:
     NOKIA_CALLBACK_URL = 'http://oh-nokiahealth-integration.herokuapp.com/complete_nokia'
