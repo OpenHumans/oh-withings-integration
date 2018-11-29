@@ -20,12 +20,6 @@ class Command(BaseCommand):
                     "client_secret": str(settings.NOKIA_CLIENT_SECRET),
                     "refresh_token": str(user.oauth_token) + ":" + str(user.oauth_token_secret)
                 }
-                # migrateUrl = baseUrl + \
-                #             "?grant_type=refresh_token" + \
-                #             "&client_id=" + settings.NOKIA_CLIENT_ID + \
-                #             "&client_secret=" + settings.NOKIA_CLIENT_SECRET + \
-                #             "&refresh_token=" + user.oauth_token + ":" + user.oauth_token_secret
-                # print("Token migration url: " + migrateUrl)  
                 print("Token payload")
                 print(payload)
                 try:
