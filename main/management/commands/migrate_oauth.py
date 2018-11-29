@@ -8,7 +8,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         nokia_users = NokiaHealthMember.objects.all()
-        for user in nokia_users[1:5]:
+        for user in nokia_users[5:]:
             if user.oauth_token:
                 print("user {} has a token".format(user.userid))
                 baseUrl = 'https://account.withings.com/oauth2/token'
