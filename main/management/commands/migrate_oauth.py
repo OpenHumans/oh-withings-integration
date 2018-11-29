@@ -22,6 +22,7 @@ class Command(BaseCommand):
                 print("Token migration url: " + migrateUrl)  
                 r = requests.post(migrateUrl)
                 q = r.json()
+                print(q)
                 # Update user data & save
                 user.access_token = q.access_token
                 user.refresh_token = q.refresh_token
