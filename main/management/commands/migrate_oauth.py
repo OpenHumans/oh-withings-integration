@@ -8,7 +8,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         nokia_users = NokiaHealthMember.objects.all()
-        for user in nokia_users[:5]:
+        for user in nokia_users[1:5]:
             if user.oauth_token:
                 print("user {} has a token".format(user.userid))
                 baseUrl = 'https://account.withings.com/oauth2/token'
@@ -32,12 +32,12 @@ class Command(BaseCommand):
                 q = r.json()
                 print(q)
                 # Update user data & save
-                user.access_token = q.access_token
-                user.refresh_token = q.refresh_token
-                user.expires_in = q.expires_in
-                user.scope = q.scope
-                user.token_type = q.token_type
-                user.userid = q.userid
+                user.access_token = q['access_token']
+                user.refresh_token = q['refresh_token']
+                user.expires_in = q['expires_in']
+                user.scope = q['scope']
+                user.token_type = q['token_type']
+                user.userid = q['userid']
                 user.save()
             else:
                 print("User {} does not have an OAuth1 token, skipping".format(user.userid))
