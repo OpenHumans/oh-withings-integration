@@ -149,7 +149,7 @@ def complete_nokia(request):
         'code': code,
         'grant_type': 'authorization_code',
         'client_id': settings.NOKIA_CLIENT_ID,
-        'client_secret': settings.NOKIA_CONSUMER_SECRET,
+        'client_secret': settings.NOKIA_CLIENT_SECRET,
         'redirect_uri': settings.WITHINGS_REDIRECT_URI,
         'state': 'abc'
     }
