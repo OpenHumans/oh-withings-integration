@@ -150,7 +150,7 @@ def complete_nokia(request):
         'grant_type': 'authorization_code',
         'client_id': settings.NOKIA_CLIENT_ID,
         'client_secret': settings.NOKIA_CONSUMER_SECRET,
-        'redirect_uri': 'http://127.0.0.1:5000/complete_nokia',
+        'redirect_uri': settings.WITHINGS_REDIRECT_URI,
         'state': 'abc'
     }
     r = requests.post('https://account.withings.com/oauth2/token', payload)
