@@ -11,6 +11,8 @@ app = Celery('datauploader')
 # the configuration object to child processes.
 # - namespace='CELERY' means all celery-related configuration keys
 #   should have a `CELERY_` prefix.
+# Removed the namespace=CELERY so that Requ
+app.conf.broker_url = os.getenv('REDIS_URL', 'redis://')
 app.config_from_object('django.conf:settings')
 app.conf.update(CELERY_BROKER_URL=os.getenv('REDIS_URL', 'redis://'),
                 CELERY_RESULT_BACKEND=os.getenv('REDIS_URL', 'redis://'))
