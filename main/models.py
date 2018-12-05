@@ -53,7 +53,7 @@ class NokiaHealthMember(models.Model):
             data = {
                 'grant_type': 'refresh_token',
                 'client_id': settings.NOKIA_CLIENT_ID,
-                'client_secret': settings.NOKIA_CONSUMER_SECRET,
+                'client_secret': settings.NOKIA_CLIENT_SECRET,
                 'refresh_token': self.refresh_token
             })
         print(response.text)
