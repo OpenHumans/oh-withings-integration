@@ -11,7 +11,7 @@ def get_nokia_file(oh_member):
                           client_secret=settings.OPENHUMANS_CLIENT_SECRET)
         user_object = api.exchange_oauth2_member(oh_access_token)
         for dfile in user_object['data']:
-            if 'nokia' in dfile['metadata']['tags']:
+            if 'nokiahealthdata' in dfile['metadata']['tags']:
                 return dfile['download_url']
         return ''
     except:
