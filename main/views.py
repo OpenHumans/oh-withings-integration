@@ -44,7 +44,7 @@ def about(request):
             #    'redirect_uri': '{}/complete'.format(settings.OPENHUMANS_APP_BASE_URL),
                'oh_proj_page': settings.OH_ACTIVITY_PAGE}
     return render(request, 'main/about.html', context=context)
-    
+
 
 def complete(request):
     """
@@ -104,6 +104,11 @@ def dashboard(request):
         }
         return render(request, 'main/dashboard.html',
                       context=context)
+    return redirect("/")
+
+
+def logout_user(request):
+    logout(request)
     return redirect("/")
 
 
@@ -167,7 +172,7 @@ def complete_nokia(request):
     rjson = r.json()
     print(rjson)
 
-    # Save the user 
+    # Save the user
     try:
         nokia_member = NokiaHealthMember.objects.get(userid=rjson['userid'])
         nokia_member.userid = rjson['userid']
