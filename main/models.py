@@ -49,8 +49,9 @@ class NokiaHealthMember(models.Model):
         """
         print("calling refresh token method in class")
         response = requests.get(
-            'https://account.withings.com/oauth2/token',
+            'https://wbsapi.withings.net/v2/oauth2',
             data = {
+                'action': 'requesttoken',
                 'grant_type': 'refresh_token',
                 'client_id': settings.NOKIA_CLIENT_ID,
                 'client_secret': settings.NOKIA_CLIENT_SECRET,
@@ -59,11 +60,11 @@ class NokiaHealthMember(models.Model):
         print(response.text)
         if response.status_code == 200:
             data = response.json()
-            self.access_token = data['access_token']
-            self.refresh_token = data['refresh_token']
-            self.token_expires = self.get_expiration(data['expires_in'])
-            self.scope = data['scope']
-            self.userid = data['userid']
+            self.access_token = data['body']['access_token']
+            self.refresh_token = data['body']['refresh_token']
+            self.token_expires = self.get_expiration(data['body']['expires_in'])
+            self.scope = data['body']['scope']
+            self.userid = data['body']['userid']
             self.save()
             return True
         return False

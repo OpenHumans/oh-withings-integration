@@ -163,34 +163,35 @@ def complete_nokia(request):
     payload = {
         'code': code,
         'grant_type': 'authorization_code',
+        'action': 'requesttoken',
         'client_id': settings.NOKIA_CLIENT_ID,
         'client_secret': settings.NOKIA_CLIENT_SECRET,
         'redirect_uri': settings.WITHINGS_REDIRECT_URI,
         'state': 'abc'
     }
-    r = requests.post('https://account.withings.com/oauth2/token', payload)
+    r = requests.post('https://wbsapi.withings.net/v2/oauth2', payload)
     rjson = r.json()
     print(rjson)
 
     # Save the user
     try:
-        nokia_member = NokiaHealthMember.objects.get(userid=rjson['userid'])
-        nokia_member.userid = rjson['userid']
-        nokia_member.access_token = rjson['access_token']
-        nokia_member.refresh_token = rjson['refresh_token']
-        nokia_member.expires_in = rjson['expires_in']
-        nokia_member.scope = rjson['scope']
-        nokia_member.token_type = rjson['token_type']
+        nokia_member = NokiaHealthMember.objects.get(userid=rjson['body']['userid'])
+        nokia_member.userid = rjson['body']['userid']
+        nokia_member.access_token = rjson['body']['access_token']
+        nokia_member.refresh_token = rjson['body']['refresh_token']
+        nokia_member.expires_in = rjson['body']['expires_in']
+        nokia_member.scope = rjson['body']['scope']
+        nokia_member.token_type = rjson['body']['token_type']
         nokia_member.save()
     except NokiaHealthMember.DoesNotExist:
         nokia_member, created = NokiaHealthMember.objects.get_or_create(
             user=oh_user,
-            userid=rjson['userid'],
-            access_token=rjson['access_token'],
-            refresh_token=rjson['refresh_token'],
-            expires_in=rjson['expires_in'],
-            scope=rjson['scope'],
-            token_type=rjson['token_type'])
+            userid=rjson['body']['userid'],
+            access_token=rjson['body']['access_token'],
+            refresh_token=rjson['body']['refresh_token'],
+            expires_in=rjson['body']['expires_in'],
+            scope=rjson['body']['scope'],
+            token_type=rjson['body']['token_type'])
 
     if nokia_member:
         # Fetch user's data from Nokia (update the data if it already existed)
